@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Open Houses</title>
+        <link rel="stylesheet" href="/styles.css">
+    </head>
+
+    <body>
+        <div class="input-fields">
+            <form onsubmit="search()">
+                <label for="location">City or ZIP Code</label>
+                <input type="text" id="location" name="location" value="San Francisco" required>
+                <select id="listingstatus" name="listingstatus" aria-label="listingstatus" required>
+                    <option selected disabled value="">Listing Status</option>
+                    <option value="For_Sale">Sale</option>
+                    <option value="For_Rent">Rent</option>
+                </select>
+                <label for="min">Min</label>
+                <input type="text" id="min" name="min" value="400000" required>
+                <label for="max">Max</label>
+                <input type="text" id="max" name="max" value="700000" required>
+                <fieldset>
+                    <legend>Tours:</legend>
+
+                    <div>
+                        <input class="checkbox" type="checkbox" id="tourOpenHouse" name="tourOpenHouse" checked />
+                        <label for="tourOpenHouse">Must have open house</label>
+                    </div>
+
+                    <div>
+                        <input class="checkbox" type="checkbox" id="tour3D" name="tour3D" />
+                        <label for="tour3D">Must have 3D Tour</label>
+                    </div>
+                </fieldset>
+                <button type="submit" onclick="search(); return false;">Search</button>
+            </form>
+        </div>
+
+        <script>
+            async function search() {
+                const location = document.getElementById("location").value;
+                const listingstatus = document.getElementById("listingstatus").value;
+                const min = document.getElementById("min").value;
+                const max = document.getElementById("max").value;
+                const tourOpenHouse = document.getElementById("tourOpenHouse").checked;
+                const tour3D = document.getElementById("tour3D").checked;
+
+                const res = await fetch("/api/search", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ location, listingstatus, min, max, tourOpenHouse, tour3D }),
+                });
+
+                const data = await res.json();
+                console.log(data);
+            }
+        </script>
+    </body>
+</html>
