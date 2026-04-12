@@ -5,11 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Open Houses</title>
         <link rel="stylesheet" href="/styles.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     </head>
 
     <body>
         <div class="input-fields">
-            <form onsubmit="search()">
+            <form onsubmit="search(event)">
                 <label for="location">City or ZIP Code</label>
                 <input type="text" id="location" name="location" value="San Francisco" required>
                 <select id="listingstatus" name="listingstatus" aria-label="listingstatus" required>
@@ -18,9 +20,9 @@
                     <option value="For_Rent">Rent</option>
                 </select>
                 <label for="min">Min</label>
-                <input type="text" id="min" name="min" value="400000" required>
+                <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="min" name="min" value="400000" required>
                 <label for="max">Max</label>
-                <input type="text" id="max" name="max" value="700000" required>
+                <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="max" name="max" value="700000" required>
                 <fieldset>
                     <legend>Tours:</legend>
 
@@ -34,13 +36,15 @@
                         <label for="tour3D">Must have 3D Tour</label>
                     </div>
                 </fieldset>
-                <button type="submit" onclick="search(); return false;">Search</button>
+                <button type="submit">Search</button>
             </form>
         </div>
         <div id="results"></div>
 
         <script>
-            async function search() {
+            async function search(e) {
+                e.preventDefault();
+                
                 const location = document.getElementById("location").value;
                 const listingstatus = document.getElementById("listingstatus").value;
                 const min = document.getElementById("min").value;
@@ -76,15 +80,36 @@
                     const card = document.createElement("div");
                     card.className = "listing-card";
 
+                    const mapId = `map-${listing.property.zpid}`;
                     card.innerHTML = `
-                        <p>${listing.property.price.value}</p>
+                        <p>
+                            ${new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                maximumFractionDigits: 0
+                            }).format(listing.property.price.value)}
+                        </p>
                         <h3><a href="https://www.zillow.com/homedetails/${listing.property.zpid}_zpid/" target="_blank">${listing.property.address.streetAddress}</a></h3>
-                        <p>${JSON.stringify(listing.property.location, null, 2)}</p>
                         <p>${listing.property.propertyType}</p>
                         <p>${listing.property.livingArea} sqft</p>
-                    `;
 
+                        <div class="fade"></div>
+                        <div id="${mapId}" class="map"></div>
+                    `;
                     container.appendChild(card);
+
+
+                    const latitude = listing.property.location.latitude;
+                    const longitude = listing.property.location.longitude;
+                    const map = L.map(mapId, {
+                        zoomControl: false
+                    }).setView([latitude, longitude], 13);
+
+                    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                        attribution: "&copy; OpenStreetMap contributors"
+                    }).addTo(map);
+
+                    L.marker([latitude, longitude]).addTo(map);
                 });
             }
         </script>

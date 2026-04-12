@@ -6,9 +6,46 @@ input {
 	text-align: center;
 }
 
+/* Chrome, Safari, Edge */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
 .listing-card {
 	border: 1px solid #ddd;
 	padding: 16px;
 	margin-bottom: 12px;
 	border-radius: 8px;
+	position: relative;
+}
+
+.fade {
+	width: 50vw;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 20%;
+	z-index: -1;
+	background: linear-gradient(
+		to right,
+		white 60%,
+		rgba(255, 255, 255, 0) 100%
+	);
+}
+
+.map {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 40%;
+	right: 0;
+	z-index: -2;
+	margin: auto;
 }
