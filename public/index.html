@@ -38,10 +38,36 @@
                 </fieldset>
                 <button type="submit">Search</button>
             </form>
+
+            <form onsubmit="login(event)">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Login</button>
+            </form>
         </div>
         <div id="results"></div>
 
         <script>
+            async function login(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                const res = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await res.json();
+                console.log(data);
+
+                renderListings(data);
+            }
+
             async function search(e) {
                 e.preventDefault();
                 
@@ -59,10 +85,11 @@
                 });
 
                 const data = await res.json();
-                console.log(data);
+                //console.log(data);
 
                 renderListings(data);
             }
+
 
             function renderListings(data) {
                 const container = document.getElementById("results");

@@ -1,31 +1,102 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const path = require("path");
 
 const app = express();
 const port = 3000;
 
+const { db, connectToDB } = require('./apis/db');
+const saltRounds = 10;
 const { getResults } = require('./apis/zillow-realtyapi');
 
 
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json());
+(async () => {
+    try {
+        await connectToDB();
+        await db.query("SELECT 1");
 
-app.get("/", (req, res) => {
-	res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+        setInterval(async () => {
+            try {
+                await db.query('SELECT 1');
+                console.log("Pinged DB to keep it warm");
+            } catch (err) {
+                console.error("Ping failed:", err);
+            }
+        }, 4 * 60 * 1000);
 
-app.post("/api/search", async (req, res) => {
-	try {
-		const { location, listingstatus, min, max, tourOpenHouse, tour3D } = req.body;
+		app.use(express.static(path.join(__dirname, "public")));
+		app.use(express.json());
 
-		const result = await getResults(location, listingstatus, min, max, tourOpenHouse, tour3D);
-		res.json(result);
-	} catch (error) {
-		console.error('API route error:', error);
-		res.status(500).json({ error: 'Failed to fetch data' });
-	}
-});
+		app.get("/", (req, res) => {
+			res.sendFile(path.join(__dirname, "public", "index.html"));
+		});
 
-app.listen(port, () => {
-	console.log(`Server listening on port ${port}`);
-});
+		app.post("/api/login", async (req, res) => {
+			try {
+				const { username, password } = req.body;
+
+				const [user] = await db.query(`SELECT * FROM users WHERE name = ?`, [username]);
+
+				const nick = username;
+				const normalized = nick.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+                const isAscii = /^[A-Za-z0-9\s\-]+$/.test(normalized);
+                const byteLength = new TextEncoder().encode(nick).length;
+
+				if ((nick === nick.trim()) && (normalized && isAscii) && (nick.length <= 20) && (byteLength <= 80)) {
+					if (user.length > 0) {
+						const bool = bcrypt.compareSync(password, user[0].password);
+						if (bool) {
+							const lists = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [user[0].id]);
+							res.json(lists);
+							console.log("User logged in:", username);
+						} else {
+							console.log("Incorrect password for user:", username);
+						}
+					} else {
+						const hash = bcrypt.hashSync(password, saltRounds);
+
+						const [insertResult] = await db.query(`INSERT INTO users (name, password) VALUES (?, ?)`, [nick, hash]);
+						const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [insertResult.insertId]);
+						res.json(lists);
+						console.log("New user registered:", username);
+					}
+				}
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to fetch data' });
+			}
+		});
+
+		/*
+		app.get("/api/me", async (req, res) => {
+			const userId = req.session.userId;
+
+			const [user] = await db.query(`SELECT id, name FROM users WHERE id = ?`, [userId]);
+
+			const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [userId]);
+
+			res.json({ user: user[0], lists });
+		});
+		*/
+
+		app.post("/api/search", async (req, res) => {
+			try {
+				const { location, listingstatus, min, max, tourOpenHouse, tour3D } = req.body;
+
+				const result = await getResults(location, listingstatus, min, max, tourOpenHouse, tour3D);
+				res.json(result);
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to fetch data' });
+			}
+		});
+
+		app.listen(port, () => {
+			console.log(`Server listening on port ${port}`);
+		});
+
+	} catch (err) {
+        console.error('Failed to start server due to DB error:', err);
+        process.exit(1);
+    }
+})();
