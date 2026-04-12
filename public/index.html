@@ -65,7 +65,7 @@
                 const data = await res.json();
                 console.log(data);
 
-                renderListings(data);
+                renderListings(data, false);
             }
 
             async function search(e) {
@@ -87,38 +87,48 @@
                 const data = await res.json();
                 //console.log(data);
 
-                renderListings(data);
+                renderListings(data, true);
             }
 
 
-            function renderListings(data) {
+            function renderListings(data, public) {
                 const container = document.getElementById("results");
                 container.innerHTML = "";
 
-                const card = document.createElement("div");
-                card.innerHTML = `
-                    <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
-                    <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
-                    <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
-                `;
-                container.appendChild(card);
+                if (public) {
+                    const card = document.createElement("div");
+                    card.innerHTML = `
+                        <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
+                        <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
+                        <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
+                    `;
+                    container.appendChild(card);
+                }
 
+                if (!Array.isArray(data?.searchResults) || data.searchResults.length === 0) {
+                    container.innerHTML = "<p>No saved lists found.</p>";
+                    return;
+                }
                 data.searchResults.forEach((listing) => {
                     const card = document.createElement("div");
                     card.className = "listing-card";
 
-                    const mapId = `map-${listing.property.zpid}`;
+                    const zpid = listing.property?.zpid;
+                    if (!zpid) {
+                        return;
+                    }
+                    const mapId = `map-${zpid}`;
                     card.innerHTML = `
                         <p>
-                            ${new Intl.NumberFormat("en-US", {
+                            ${listing.property?.price?.value ? new Intl.NumberFormat("en-US", {
                                 style: "currency",
                                 currency: "USD",
                                 maximumFractionDigits: 0
-                            }).format(listing.property.price.value)}
+                            }).format(listing.property?.price?.value) : "Price not available"}
                         </p>
-                        <h3><a href="https://www.zillow.com/homedetails/${listing.property.zpid}_zpid/" target="_blank">${listing.property.address.streetAddress}</a></h3>
-                        <p>${listing.property.propertyType}</p>
-                        <p>${listing.property.livingArea} sqft</p>
+                        <h3>${listing.property?.address?.streetAddress ? `<a href="https://www.zillow.com/homedetails/${zpid}_zpid/" target="_blank">${listing.property?.address?.streetAddress}</a>` : "Address not available"}</h3>
+                        <p>${listing.property?.propertyType ? listing.property?.propertyType : "Type not available"}</p>
+                        <p>${listing.property?.livingArea ? `${listing.property?.livingArea} sqft` : "Size not available"}</p>
 
                         <div class="fade"></div>
                         <div id="${mapId}" class="map"></div>
@@ -126,17 +136,19 @@
                     container.appendChild(card);
 
 
-                    const latitude = listing.property.location.latitude;
-                    const longitude = listing.property.location.longitude;
-                    const map = L.map(mapId, {
-                        zoomControl: false
-                    }).setView([latitude, longitude], 13);
+                    const latitude = listing.property?.location?.latitude;
+                    const longitude = listing.property?.location?.longitude;
+                    if (latitude != null && longitude != null) {
+                        const map = L.map(mapId, {
+                            zoomControl: false
+                        }).setView([latitude, longitude], 13);
 
-                    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                        attribution: "&copy; OpenStreetMap contributors"
-                    }).addTo(map);
+                        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                            attribution: "&copy; OpenStreetMap contributors"
+                        }).addTo(map);
 
-                    L.marker([latitude, longitude]).addTo(map);
+                        L.marker([latitude, longitude]).addTo(map);
+                    }
                 });
             }
         </script>
