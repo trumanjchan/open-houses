@@ -37,6 +37,7 @@
                 <button type="submit" onclick="search(); return false;">Search</button>
             </form>
         </div>
+        <div id="results"></div>
 
         <script>
             async function search() {
@@ -55,6 +56,36 @@
 
                 const data = await res.json();
                 console.log(data);
+
+                renderListings(data);
+            }
+
+            function renderListings(data) {
+                const container = document.getElementById("results");
+                container.innerHTML = "";
+
+                const card = document.createElement("div");
+                card.innerHTML = `
+                    <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
+                    <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
+                    <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
+                `;
+                container.appendChild(card);
+
+                data.searchResults.forEach((listing) => {
+                    const card = document.createElement("div");
+                    card.className = "listing-card";
+
+                    card.innerHTML = `
+                        <p>${listing.property.price.value}</p>
+                        <h3><a href="https://www.zillow.com/homedetails/${listing.property.zpid}_zpid/" target="_blank">${listing.property.address.streetAddress}</a></h3>
+                        <p>${JSON.stringify(listing.property.location, null, 2)}</p>
+                        <p>${listing.property.propertyType}</p>
+                        <p>${listing.property.livingArea} sqft</p>
+                    `;
+
+                    container.appendChild(card);
+                });
             }
         </script>
     </body>

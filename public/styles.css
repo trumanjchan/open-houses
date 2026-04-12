@@ -1,7 +1,14 @@
 body {
-    margin: 0;
+	margin: 0;
 }
 
 input {
-    text-align: center;
+	text-align: center;
+}
+
+.listing-card {
+	border: 1px solid #ddd;
+	padding: 16px;
+	margin-bottom: 12px;
+	border-radius: 8px;
 }

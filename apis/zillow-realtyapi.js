@@ -16,8 +16,6 @@ const getResults = async (location, listingstatus, min, max, tourOpenHouse, tour
 			tour3D = "Must have 3D Tour";
 			tours.push("Must have 3D Tour");
 		}
-		console.log(tours)
-		console.log(tours.length > 0 ? tours.join(", ") : "")
 
 		const config = {
 			method: "get",
@@ -46,19 +44,6 @@ const getResults = async (location, listingstatus, min, max, tourOpenHouse, tour
 
 		return axios(url, config)
 			.then((response) => {
-				/*
-				console.log(response.data.pagesInfo);
-				console.log(response.data.resultsCount.totalMatchingCount);
-
-				response.data.searchResults.forEach((result) => {
-					console.log("-----");
-					console.log(result.property.price.value);
-					console.log(result.property.location);
-					console.log(result.property.address.streetAddress + " | " + result.property.propertyType + " | " + result.property.livingArea + " sqft ");
-					console.log(`https://www.zillow.com/homedetails/${result.property.zpid}_zpid/`);
-				});
-				*/
-				
 				return response.data;
 			})
 			.catch((error) => console.error(error));
