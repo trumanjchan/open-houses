@@ -27,16 +27,19 @@ const config = {
     listPriceRange: "min:400000, max:700000",
     tours: "Must have open house" //Must have 3D Tour
   }
-};
+}
 
 axios(url, config)
   .then(response => {
-    console.log(response.data);
+    console.log(response.data.pagesInfo)
+    console.log(response.data.resultsCount.totalMatchingCount)
 
     response.data.searchResults.forEach(result => {
         console.log("-----")
         console.log(result.property.price.value)
-        console.log(result.property.address.streetAddress + " | " + result.property.propertyType + " | " + result.property.livingArea + " sqft ");
-    });
+        console.log(result.property.location)
+        console.log(result.property.address.streetAddress + " | " + result.property.propertyType + " | " + result.property.livingArea + " sqft ")
+        console.log(`https://www.zillow.com/homedetails/${result.property.zpid}_zpid/`)
+    })
   })
-  .catch(error => console.error(error));
+  .catch(error => console.error(error))
