@@ -54,7 +54,8 @@
                 loggedIn: false,
                 name: "",
                 userId: null,
-                currentList: []
+                currentList: [],
+                savedLists: []
             };
 
             const parts = window.location.pathname.split("/");
@@ -63,6 +64,17 @@
             if (name && id) {
                 loadList(name, id);
             }
+
+            window.addEventListener("popstate", () => {
+                const path = window.location.pathname;
+                const parts = path.split("/");
+
+                if (parts[2] === "list") {
+                    loadList(parts[1], parts[3]);
+                } else {
+                    renderSavedLists();
+                }
+            });
 
             async function login(e) {
                 e.preventDefault();
@@ -89,8 +101,9 @@
                 auth.name = data.user.name;
                 auth.userId = data.user.id;
                 auth.currentList = [];
+                auth.savedLists = data.lists;
                 document.getElementById("loginForm").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
-                renderSavedLists(data);
+                renderSavedLists();
             }
 
             async function search(e) {
@@ -115,15 +128,15 @@
             }
 
 
-            function renderSavedLists(data) {
+            function renderSavedLists() {
                 const container = document.getElementById("results");
                 container.innerHTML = "<h2>Saved Lists</h2>";
 
-                if (!Array.isArray(data?.lists) || data.lists.length === 0) {
+                if (!Array.isArray(auth.savedLists[0]) || auth.savedLists[0].length === 0) {
                     container.innerHTML += "<p>No saved lists found.</p>";
                     return;
                 }
-                [...data.lists[0]].reverse().forEach((list) => {
+                [...auth.savedLists[0]].reverse().forEach((list) => {
                     const listTitle = document.createElement("h4");
                     listTitle.textContent = list.title;
                     listTitle.addEventListener("click", async () => {
