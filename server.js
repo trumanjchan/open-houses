@@ -47,8 +47,14 @@ const { getResults } = require('./apis/zillow-realtyapi');
 						const bool = bcrypt.compareSync(password, user[0].password);
 						if (bool) {
 							const lists = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [user[0].id]);
-							res.json(lists);
-							console.log("User logged in:", username);
+							res.json({
+								user: {
+									id: user[0].id,
+									name: user[0].name
+								},
+								lists
+							});
+							console.log("User logged in:", nick);
 						} else {
 							return res.status(401).json({ error: "Incorrect password" });
 						}
@@ -57,8 +63,14 @@ const { getResults } = require('./apis/zillow-realtyapi');
 
 						const [insertResult] = await db.query(`INSERT INTO users (name, password) VALUES (?, ?)`, [nick, hash]);
 						const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [insertResult.insertId]);
-						res.json(lists);
-						console.log("New user registered:", username);
+						res.json({
+							user: {
+								id: insertResult.insertId,
+								name: nick
+							},
+							lists
+						});
+						console.log("New user registered:", nick);
 					}
 				}
 			} catch (error) {
@@ -88,6 +100,19 @@ const { getResults } = require('./apis/zillow-realtyapi');
 			} catch (error) {
 				console.error('API route error:', error);
 				res.status(500).json({ error: 'Failed to fetch data' });
+			}
+		});
+
+		app.post("/api/save-list", async (req, res) => {
+			try {
+				const { user_id, title, list } = req.body;
+
+				await db.query(`INSERT INTO lists (user_id, title, list) VALUES (?, ?, ?)`, [user_id, title, JSON.stringify(list)]);
+
+				res.json({ success: true });
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to save list' });
 			}
 		});
 

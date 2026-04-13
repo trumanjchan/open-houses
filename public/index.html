@@ -52,7 +52,10 @@
         <script>
             const auth = {
                 loggedIn: false,
-                currentList: []
+                name: "",
+                userId: null,
+                currentList: [],
+                //savedLists: []
             };
 
             async function login(e) {
@@ -78,10 +81,12 @@
                 }
 
                 auth.loggedIn = true;
-                document.getElementById("loginForm").innerHTML = `
-                    <p>Welcome, ${username}!</p>
-                `;
-                //renderSavedLists(data);
+                auth.name = data.user.name;
+                auth.userId = data.user.id;
+                auth.currentList = [];
+                //auth.savedLists = data.lists || [];
+                document.getElementById("loginForm").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
+                renderSavedLists(data);
             }
 
             async function search(e) {
@@ -107,6 +112,62 @@
             }
 
 
+            function renderSavedLists(data) {
+                const container = document.getElementById("results");
+                container.innerHTML = "<h2>Saved Lists</h2>";
+
+                if (!Array.isArray(data?.lists) || data.lists.length === 0) {
+                    container.innerHTML += "<p>No saved lists found.</p>";
+                    return;
+                }
+                [...data.lists[0]].reverse().forEach((list) => {
+                    const listTitle = document.createElement("h4");
+                    listTitle.textContent = list.title;
+                    container.appendChild(listTitle);
+
+                    list.list.forEach((listing) => {
+                        const card = document.createElement("div");
+                        card.className = "listing-card";
+
+                        const zpid = listing.zpid;
+                        if (!zpid) {
+                            return;
+                        }
+                        const mapId = `map-${zpid}`;
+                        card.innerHTML = `
+                            <p>
+                                ${listing.price ? new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "USD",
+                                    maximumFractionDigits: 0
+                                }).format(listing.price) : "Price not available"}
+                            </p>
+                            <h3>${listing.address ? `<a href="https://www.zillow.com/homedetails/${zpid}_zpid/" target="_blank">${listing.address}</a>` : "Address not available"}</h3>
+                            <p>${listing.type ? listing.type : "Type not available"}</p>
+                            <p>${listing.sqft ? `${listing.sqft} sqft` : "Size not available"}</p>
+
+                            <div class="fade"></div>
+                            <div id="${mapId}" class="map"></div>
+                        `;
+                        container.appendChild(card);
+
+                        const latitude = listing.latitude;
+                        const longitude = listing.longitude;
+                        if (latitude != null && longitude != null) {
+                            const map = L.map(mapId, {
+                                zoomControl: false
+                            }).setView([latitude, longitude], 13);
+
+                            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                                attribution: "&copy; OpenStreetMap contributors"
+                            }).addTo(map);
+
+                            L.marker([latitude, longitude]).addTo(map);
+                        }
+                    });
+                });
+            }
+
             function renderListings(data) {
                 const container = document.getElementById("results");
                 container.innerHTML = "";
@@ -116,6 +177,7 @@
                     <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
                     <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
                     <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
+                    <div id="save-list-ui"></div>
                 `;
                 container.appendChild(card);
 
@@ -200,6 +262,8 @@
                     latitude: listing.property?.location?.latitude,
                     longitude: listing.property?.location?.longitude
                 });
+
+                renderSaveListButton();
             }
 
             function removeFromList(listing) {
@@ -209,6 +273,40 @@
                 if (index !== -1) {
                     auth.currentList.splice(index, 1);
                 }
+
+                renderSaveListButton();
+            }
+
+            function renderSaveListButton() {
+                const container = document.getElementById("save-list-ui");
+
+                if (!container) return;
+
+                container.innerHTML = "";
+
+                if (auth.currentList.length === 0) return;
+
+                const button = document.createElement("button");
+                button.textContent = "Save List";
+
+                button.addEventListener("click", async () => {
+                    const title = prompt("Name your list:");
+                    if (!title) return;
+
+                    await fetch("/api/save-list", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            user_id: auth.userId,
+                            title,
+                            list: auth.currentList
+                        })
+                    });
+
+                    alert("List saved!");
+                });
+
+                container.appendChild(button);
             }
         </script>
     </body>
