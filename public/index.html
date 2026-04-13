@@ -39,7 +39,7 @@
                 <button type="submit">Search</button>
             </form>
 
-            <form onsubmit="login(event)">
+            <form id="loginForm" onsubmit="login(event)">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
                 <label for="password">Password</label>
@@ -50,6 +50,11 @@
         <div id="results"></div>
 
         <script>
+            const auth = {
+                loggedIn: false,
+                currentList: []
+            };
+
             async function login(e) {
                 e.preventDefault();
                 
@@ -65,7 +70,18 @@
                 const data = await res.json();
                 console.log(data);
 
-                renderListings(data, false);
+                if (!res.ok) {
+                    document.getElementById("password").value = "";
+                    document.getElementById("password").focus();
+                    alert(data.error);
+                    return;
+                }
+
+                auth.loggedIn = true;
+                document.getElementById("loginForm").innerHTML = `
+                    <p>Welcome, ${username}!</p>
+                `;
+                //renderSavedLists(data);
             }
 
             async function search(e) {
@@ -87,26 +103,24 @@
                 const data = await res.json();
                 //console.log(data);
 
-                renderListings(data, true);
+                renderListings(data);
             }
 
 
-            function renderListings(data, public) {
+            function renderListings(data) {
                 const container = document.getElementById("results");
                 container.innerHTML = "";
 
-                if (public) {
-                    const card = document.createElement("div");
-                    card.innerHTML = `
-                        <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
-                        <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
-                        <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
-                    `;
-                    container.appendChild(card);
-                }
+                const card = document.createElement("div");
+                card.innerHTML = `
+                    <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
+                    <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
+                    <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
+                `;
+                container.appendChild(card);
 
                 if (!Array.isArray(data?.searchResults) || data.searchResults.length === 0) {
-                    container.innerHTML = "<p>No saved lists found.</p>";
+                    container.innerHTML = "<p>No search results found.</p>";
                     return;
                 }
                 data.searchResults.forEach((listing) => {
@@ -133,6 +147,30 @@
                         <div class="fade"></div>
                         <div id="${mapId}" class="map"></div>
                     `;
+
+                    if (auth.loggedIn) {
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+
+                        checkbox.addEventListener("change", () => {
+                            if (checkbox.checked) {
+                                addToList(listing);
+                                console.log("Current List:", auth.currentList);
+                            } else {
+                                removeFromList(listing);
+                                console.log("Updated List:", auth.currentList);
+                            }
+                        });
+
+                        const label = document.createElement("label");
+                        label.textContent = " Save to list";
+
+                        const wrapper = document.createElement("div");
+                        wrapper.appendChild(checkbox);
+                        wrapper.appendChild(label);
+
+                        card.appendChild(wrapper);
+                    }
                     container.appendChild(card);
 
 
@@ -150,6 +188,27 @@
                         L.marker([latitude, longitude]).addTo(map);
                     }
                 });
+            }
+
+            function addToList(listing) {
+                auth.currentList.push({
+                    zpid: listing.property?.zpid,
+                    address: listing.property?.address?.streetAddress,
+                    price: listing.property?.price?.value,
+                    type: listing.property?.propertyType,
+                    sqft: listing.property?.livingArea,
+                    latitude: listing.property?.location?.latitude,
+                    longitude: listing.property?.location?.longitude
+                });
+            }
+
+            function removeFromList(listing) {
+                const zpid = listing.property?.zpid;
+                const index = auth.currentList.findIndex(i => i.zpid === zpid);
+
+                if (index !== -1) {
+                    auth.currentList.splice(index, 1);
+                }
             }
         </script>
     </body>

@@ -50,7 +50,7 @@ const { getResults } = require('./apis/zillow-realtyapi');
 							res.json(lists);
 							console.log("User logged in:", username);
 						} else {
-							console.log("Incorrect password for user:", username);
+							return res.status(401).json({ error: "Incorrect password" });
 						}
 					} else {
 						const hash = bcrypt.hashSync(password, saltRounds);
