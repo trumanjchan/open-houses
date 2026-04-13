@@ -54,9 +54,15 @@
                 loggedIn: false,
                 name: "",
                 userId: null,
-                currentList: [],
-                //savedLists: []
+                currentList: []
             };
+
+            const parts = window.location.pathname.split("/");
+            const name = parts[1];
+            const id = parts[3];
+            if (name && id) {
+                loadList(name, id);
+            }
 
             async function login(e) {
                 e.preventDefault();
@@ -71,7 +77,6 @@
                 });
 
                 const data = await res.json();
-                console.log(data);
 
                 if (!res.ok) {
                     document.getElementById("password").value = "";
@@ -84,7 +89,6 @@
                 auth.name = data.user.name;
                 auth.userId = data.user.id;
                 auth.currentList = [];
-                //auth.savedLists = data.lists || [];
                 document.getElementById("loginForm").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
                 renderSavedLists(data);
             }
@@ -106,7 +110,6 @@
                 });
 
                 const data = await res.json();
-                //console.log(data);
 
                 renderListings(data);
             }
@@ -123,6 +126,11 @@
                 [...data.lists[0]].reverse().forEach((list) => {
                     const listTitle = document.createElement("h4");
                     listTitle.textContent = list.title;
+                    listTitle.addEventListener("click", async () => {
+                        history.pushState({}, "", `/${auth.name}/list/${list.id}`);
+
+                        loadList(auth.name, list.id);
+                    });
                     container.appendChild(listTitle);
 
                     list.list.forEach((listing) => {
@@ -168,6 +176,55 @@
                 });
             }
 
+            function renderShareableList(name, data) {
+                const container = document.getElementById("results");
+                container.innerHTML = `
+                    <h1>${data.title}</h1>
+                    <h2>(${name}'s saved list)</h2>
+                `;
+
+                data.list.forEach((listing) => {
+                    const card = document.createElement("div");
+                    card.className = "listing-card";
+
+                    const zpid = listing.zpid;
+                    if (!zpid) {
+                        return;
+                    }
+                    const mapId = `map-${zpid}`;
+                    card.innerHTML = `
+                        <p>
+                            ${listing.price ? new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                maximumFractionDigits: 0
+                            }).format(listing.price) : "Price not available"}
+                        </p>
+                        <h3>${listing.address ? `<a href="https://www.zillow.com/homedetails/${zpid}_zpid/" target="_blank">${listing.address}</a>` : "Address not available"}</h3>
+                        <p>${listing.type ? listing.type : "Type not available"}</p>
+                        <p>${listing.sqft ? `${listing.sqft} sqft` : "Size not available"}</p>
+
+                        <div class="fade"></div>
+                        <div id="${mapId}" class="map"></div>
+                    `;
+                    container.appendChild(card);
+
+                    const latitude = listing.latitude;
+                    const longitude = listing.longitude;
+                    if (latitude != null && longitude != null) {
+                        const map = L.map(mapId, {
+                            zoomControl: false
+                        }).setView([latitude, longitude], 13);
+
+                        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                            attribution: "&copy; OpenStreetMap contributors"
+                        }).addTo(map);
+
+                        L.marker([latitude, longitude]).addTo(map);
+                    }
+                });
+            }
+
             function renderListings(data) {
                 const container = document.getElementById("results");
                 container.innerHTML = "";
@@ -186,6 +243,7 @@
                     return;
                 }
                 data.searchResults.forEach((listing) => {
+                    //console.log(listing.property.media.propertyPhotoLinks.mediumSizeLink);  //for later: add photo to the listing cards
                     const card = document.createElement("div");
                     card.className = "listing-card";
 
@@ -217,10 +275,8 @@
                         checkbox.addEventListener("change", () => {
                             if (checkbox.checked) {
                                 addToList(listing);
-                                console.log("Current List:", auth.currentList);
                             } else {
                                 removeFromList(listing);
-                                console.log("Updated List:", auth.currentList);
                             }
                         });
 
@@ -307,6 +363,13 @@
                 });
 
                 container.appendChild(button);
+            }
+
+            async function loadList(name, id) {
+                const res = await fetch(`/api/${name}/list/${id}`);
+                const data = await res.json();
+
+                renderShareableList(name, data);
             }
         </script>
     </body>

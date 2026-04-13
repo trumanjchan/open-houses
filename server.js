@@ -79,18 +79,6 @@ const { getResults } = require('./apis/zillow-realtyapi');
 			}
 		});
 
-		/*
-		app.get("/api/me", async (req, res) => {
-			const userId = req.session.userId;
-
-			const [user] = await db.query(`SELECT id, name FROM users WHERE id = ?`, [userId]);
-
-			const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [userId]);
-
-			res.json({ user: user[0], lists });
-		});
-		*/
-
 		app.post("/api/search", async (req, res) => {
 			try {
 				const { location, listingstatus, min, max, tourOpenHouse, tour3D } = req.body;
@@ -114,6 +102,27 @@ const { getResults } = require('./apis/zillow-realtyapi');
 				console.error('API route error:', error);
 				res.status(500).json({ error: 'Failed to save list' });
 			}
+		});
+
+		app.get("/:name/list/:id", async (req, res) => {
+			res.sendFile(path.join(__dirname, "public", "index.html"));
+		});
+
+		app.get("/api/:name/list/:id", async (req, res) => {
+			const { name, id } = req.params;
+
+			const [rows] = await db.query(
+				`
+				SELECT lists.id, lists.title, lists.list
+				FROM lists
+				JOIN users ON lists.user_id = users.id
+				WHERE users.name = ?
+				AND lists.id = ?
+				`,
+				[name, id]
+			);
+
+			res.json(rows[0]);
 		});
 
 		app.listen(port, () => {
