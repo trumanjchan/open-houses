@@ -10,6 +10,20 @@
     </head>
 
     <body>
+        <div id="modal" onclick="document.getElementById('modal').style.visibility='hidden';">
+            <div class="modal-container" onclick="event.stopPropagation();">
+                <form id="loginForm" onsubmit="login(event)">
+                    <input type="text" id="username" name="username" placeholder="username" required>
+                    <input type="password" id="password" name="password" placeholder="password" required>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="header">
+            <img id="login-icon" onclick="document.getElementById('modal').style.visibility='visible';" src="/assets/key.svg" alt="login icon" width="30px" />
+        </div>
+
         <div class="input-fields">
             <form onsubmit="search(event)">
                 <label for="location">City or ZIP Code</label>
@@ -37,14 +51,6 @@
                     </div>
                 </fieldset>
                 <button type="submit">Search</button>
-            </form>
-
-            <form id="loginForm" onsubmit="login(event)">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">Login</button>
             </form>
         </div>
         <div id="results"></div>
@@ -102,7 +108,8 @@
                 auth.userId = data.user.id;
                 auth.currentList = [];
                 auth.savedLists = data.lists;
-                document.getElementById("loginForm").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
+                document.getElementById("header").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
+                document.getElementById("modal").remove();
                 renderSavedLists();
             }
 

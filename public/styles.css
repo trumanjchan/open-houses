@@ -21,6 +21,49 @@ h2 {
 	margin: 20px 20px 0 20px;
 }
 
+#modal {
+	z-index: 100;
+	visibility: hidden;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	
+	background-color: rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(10px);
+
+	.modal-container {
+		align-self: center;
+		background-color: white;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		border-radius: 15px;
+		padding: 20px;
+		position: relative;
+
+		#loginForm {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+}
+
+#header {
+	padding: 20px;
+	width: fit-content;
+	margin-left: auto;
+
+	p {
+		margin: 0;
+	}
+
+	#login-icon {
+		animation: jiggle 5s ease-in-out infinite;
+	}
+}
+
 .list-title {
 	font-size: 24px;
   	display: block;
@@ -30,7 +73,7 @@ h2 {
 
 .listing-card {
 	border: 1px solid #ddd;
-	padding: 16px;
+	padding: 16px 20px;
 	margin: 20px;
 	border-radius: 8px;
 	position: relative;
@@ -60,4 +103,17 @@ h2 {
 	right: 0;
 	z-index: -2;
 	margin: auto;
+}
+
+@keyframes jiggle {
+	0%, 10%, 100% { transform: rotate(0deg); }
+	2.5% { transform: rotate(-5deg); }
+	5% { transform: rotate(5deg); }
+	7.5% { transform: rotate(-5deg); }
+}
+
+@media only screen and (max-width: 768px) {
+	.listing-card {
+		padding: 16px;
+	}
 }
