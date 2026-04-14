@@ -46,6 +46,28 @@ h2 {
 		#loginForm {
 			display: flex;
 			flex-direction: column;
+
+			#password {
+				margin: 10px 0 20px 0;
+			}
+
+			#continue-btn {
+				width: fit-content;
+  				display: flex;
+				margin: auto;
+
+				background: none;
+    			border: none;
+				cursor: pointer;
+
+				img {
+					transform: scale(1);
+					transition: transform 0.2s ease;
+				}
+			}
+			#continue-btn img:hover {
+				transform: scale(1.1);
+			}
 		}
 	}
 }
@@ -59,8 +81,20 @@ h2 {
 		margin: 0;
 	}
 
-	#login-icon {
+	#signup-or-login-btn {
 		animation: jiggle 5s ease-in-out infinite;
+
+		background: none;
+    	border: none;
+		cursor: pointer;
+
+		img {
+			transform: scale(1);
+    		transition: transform 0.2s ease;
+		}
+	}
+	#signup-or-login-btn img:hover {
+		transform: scale(1.1);
 	}
 }
 

@@ -13,15 +13,19 @@
         <div id="modal" onclick="document.getElementById('modal').style.visibility='hidden';">
             <div class="modal-container" onclick="event.stopPropagation();">
                 <form id="loginForm" onsubmit="login(event)">
-                    <input type="text" id="username" name="username" placeholder="username" required>
-                    <input type="password" id="password" name="password" placeholder="password" required>
-                    <button type="submit">Login</button>
+                    <input type="text" id="username" name="username" placeholder="username" autocomplete="off" required>
+                    <input type="password" id="password" name="password" placeholder="password" autocomplete="off" required>
+                    <button type="submit" id="continue-btn" aria-label="Continue">
+                        <img src="/assets/transfer-in.svg" alt="" width="30px" />
+                    </button>
                 </form>
             </div>
         </div>
         
         <div id="header">
-            <img id="login-icon" onclick="document.getElementById('modal').style.visibility='visible';" src="/assets/key.svg" alt="login icon" width="30px" />
+            <button id="signup-or-login-btn" onclick="document.getElementById('modal').style.visibility='visible';" aria-label="Sign up or log in">
+                <img src="/assets/key.svg" alt="" width="30px" />
+            </button>
         </div>
 
         <div class="input-fields">
