@@ -137,10 +137,14 @@
                     return;
                 }
                 [...auth.savedLists[0]].reverse().forEach((list) => {
-                    const listTitle = document.createElement("h4");
+                    const listTitle = document.createElement("a");
+                    listTitle.className = "list-title";
                     listTitle.textContent = list.title;
-                    listTitle.addEventListener("click", async () => {
-                        history.pushState({}, "", `/${auth.name}/list/${list.id}`);
+                    listTitle.href = `/${auth.name}/list/${list.id}`;
+                    listTitle.addEventListener("click", (e) => {
+                        e.preventDefault();
+
+                        history.pushState({}, "", listTitle.href);
 
                         loadList(auth.name, list.id);
                     });
@@ -192,8 +196,7 @@
             function renderShareableList(name, data) {
                 const container = document.getElementById("results");
                 container.innerHTML = `
-                    <h1>${data.title}</h1>
-                    <h2>(${name}'s saved list)</h2>
+                    <h2>${name}'s list: ${data.title}</h2>
                 `;
 
                 data.list.forEach((listing) => {
@@ -373,6 +376,7 @@
                     });
 
                     alert("List saved!");
+                    renderSavedLists();
                 });
 
                 container.appendChild(button);

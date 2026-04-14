@@ -17,12 +17,24 @@ input {
   -moz-appearance: textfield;
 }
 
+h2 {
+	margin: 20px 20px 0 20px;
+}
+
+.list-title {
+	font-size: 24px;
+  	display: block;
+  	width: fit-content;
+  	margin: 40px auto 0 auto;
+}
+
 .listing-card {
 	border: 1px solid #ddd;
 	padding: 16px;
-	margin-bottom: 12px;
+	margin: 20px;
 	border-radius: 8px;
 	position: relative;
+	overflow: hidden;
 }
 
 .fade {
