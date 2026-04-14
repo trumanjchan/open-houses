@@ -28,35 +28,40 @@
             </button>
         </div>
 
-        <div class="input-fields">
-            <form onsubmit="search(event)">
+        <form id="searchForm" onsubmit="search(event)">
+            <div class="flex-col">
                 <label for="location">City or ZIP Code</label>
                 <input type="text" id="location" name="location" value="San Francisco" required>
+            </div>
+            <div>
                 <select id="listingstatus" name="listingstatus" aria-label="listingstatus" required>
                     <option selected disabled value="">Listing Status</option>
                     <option value="For_Sale">Sale</option>
                     <option value="For_Rent">Rent</option>
                 </select>
+            </div>
+            <div class="flex-col">
                 <label for="min">Min</label>
                 <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="min" name="min" value="400000" required>
                 <label for="max">Max</label>
                 <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="max" name="max" value="700000" required>
-                <fieldset>
-                    <legend>Tours:</legend>
+            </div>
+            <fieldset>
+                <legend>Tours:</legend>
 
-                    <div>
-                        <input class="checkbox" type="checkbox" id="tourOpenHouse" name="tourOpenHouse" checked />
-                        <label for="tourOpenHouse">Must have open house</label>
-                    </div>
+                <div>
+                    <input class="checkbox" type="checkbox" id="tourOpenHouse" name="tourOpenHouse" checked />
+                    <label for="tourOpenHouse">Must have open house</label>
+                </div>
 
-                    <div>
-                        <input class="checkbox" type="checkbox" id="tour3D" name="tour3D" />
-                        <label for="tour3D">Must have 3D Tour</label>
-                    </div>
-                </fieldset>
-                <button type="submit">Search</button>
-            </form>
-        </div>
+                <div>
+                    <input class="checkbox" type="checkbox" id="tour3D" name="tour3D" />
+                    <label for="tour3D">Must have 3D Tour</label>
+                </div>
+            </fieldset>
+            <button type="submit">Search</button>
+        </form>
+
         <div id="results"></div>
 
         <script>

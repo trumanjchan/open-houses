@@ -17,9 +17,17 @@ input {
   -moz-appearance: textfield;
 }
 
-h2 {
-	margin: 20px 20px 0 20px;
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+
+	input {
+		width: fit-content;
+  		margin: auto;
+	}
 }
+
 
 #modal {
 	z-index: 100;
@@ -96,6 +104,32 @@ h2 {
 	#signup-or-login-btn img:hover {
 		transform: scale(1.1);
 	}
+}
+
+#searchForm {
+	text-align: center;
+
+	> * {
+		margin: 10px 0;
+	}
+	
+	fieldset {
+		width: fit-content;
+		margin: auto;
+
+		> div {
+			text-align: left;
+		}
+
+		legend {
+			width: fit-content;
+  			margin: auto;
+		}
+	}
+}
+
+h2 {
+	margin: 20px 20px 0 20px;
 }
 
 .list-title {
