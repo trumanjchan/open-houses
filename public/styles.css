@@ -208,6 +208,10 @@ h2 {
 	7.5% { transform: rotate(-5deg); }
 }
 
+.shareable-page #searchForm {
+	display: none;
+}
+
 .block {
 	display: block !important;
 }

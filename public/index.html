@@ -82,6 +82,7 @@
             const name = parts[0];
             const slug = parts[1];
             if (name && slug) {
+                document.body.classList.add("shareable-page");
                 loadList(name, slug);
             }
 
@@ -223,7 +224,6 @@
             }
 
             function renderShareableList(name, data) {
-                document.getElementById("searchForm").style.display = "none";
                 if (document.getElementById("home-btn")) {
                     document.getElementById("home-btn").style.display = "block";
                 }
