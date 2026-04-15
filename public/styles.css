@@ -82,14 +82,19 @@ input {
 
 #header {
 	padding: 20px;
-	width: fit-content;
-	margin-left: auto;
+	display: flex;
+	justify-content: space-between;
 
 	p {
 		margin: 0;
 	}
 
+	#home-btn {
+		display: none;
+	}
+
 	#signup-or-login-btn {
+		margin-left: auto;
 		animation: jiggle 5s ease-in-out infinite;
 
 		background: none;
@@ -125,6 +130,20 @@ input {
 			width: fit-content;
   			margin: auto;
 		}
+	}
+
+	#search-btn {
+		background: none;
+    	border: none;
+		cursor: pointer;
+
+		img {
+			transform: scale(1);
+    		transition: transform 0.2s ease;
+		}
+	}
+	#search-btn img:hover {
+		transform: scale(1.1);
 	}
 }
 
@@ -173,12 +192,18 @@ h2 {
 	margin: auto;
 }
 
+
 @keyframes jiggle {
 	0%, 10%, 100% { transform: rotate(0deg); }
 	2.5% { transform: rotate(-5deg); }
 	5% { transform: rotate(5deg); }
 	7.5% { transform: rotate(-5deg); }
 }
+
+.block {
+	display: block !important;
+}
+
 
 @media only screen and (max-width: 768px) {
 	.listing-card {

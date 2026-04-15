@@ -23,6 +23,9 @@
         </div>
         
         <div id="header">
+            <a id="home-btn" href="/" aria-label="Home">
+                <img src="/assets/door.svg" alt="" width="30px" />
+            </a>
             <button id="signup-or-login-btn" onclick="document.getElementById('modal').style.visibility='visible';" aria-label="Sign up or log in">
                 <img src="/assets/key.svg" alt="" width="30px" />
             </button>
@@ -59,7 +62,9 @@
                     <label for="tour3D">Must have 3D Tour</label>
                 </div>
             </fieldset>
-            <button type="submit">Search</button>
+            <button type="submit" id="search-btn" aria-label="Search">
+                <img src="/assets/search.svg" alt="" width="30px" />
+            </button>
         </form>
 
         <div id="results"></div>
@@ -112,12 +117,18 @@
                     return;
                 }
 
+                history.pushState({}, "", `/`);  // reset URL if user logs in from a shareable list page
+
                 auth.loggedIn = true;
                 auth.name = data.user.name;
                 auth.userId = data.user.id;
                 auth.currentList = [];
                 auth.savedLists = data.lists;
-                document.getElementById("header").innerHTML = `<p>Welcome, ${auth.name}!</p>`;
+                document.getElementById("searchForm").style.display = "none";
+                document.getElementById("header").innerHTML = `
+                    <button onclick="document.getElementById('searchForm').classList.toggle('block')">Search</button>
+                    <p>Welcome, ${auth.name}!</p>
+                `;
                 document.getElementById("modal").remove();
                 renderSavedLists();
             }
@@ -210,6 +221,11 @@
             }
 
             function renderShareableList(name, data) {
+                document.getElementById("searchForm").style.display = "none";
+                if (document.getElementById("home-btn")) {
+                    document.getElementById("home-btn").style.display = "block";
+                }
+
                 const container = document.getElementById("results");
                 container.innerHTML = `
                     <h2>${name}'s list: ${data.title}</h2>
