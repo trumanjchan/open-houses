@@ -30,9 +30,11 @@ async function connectToDB() {
 			CREATE TABLE IF NOT EXISTS lists (
 				id INT AUTO_INCREMENT PRIMARY KEY,
 				user_id INT NOT NULL,
-				title VARCHAR(64) NOT NULL,
+				title VARCHAR(255) NOT NULL,
+				slug VARCHAR(255) NOT NULL,
 				list JSON,
-				FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+				FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+				UNIQUE KEY unique_user_slug (user_id, slug)
 			)
 		`);
 		console.log("Lists table confirmed.");

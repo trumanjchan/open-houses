@@ -78,19 +78,21 @@
                 savedLists: []
             };
 
-            const parts = window.location.pathname.split("/");
-            const name = parts[1];
-            const id = parts[3];
-            if (name && id) {
-                loadList(name, id);
+            const parts = window.location.pathname.split("/").slice(1);
+            const name = parts[0];
+            const slug = parts[1];
+            if (name && slug) {
+                loadList(name, slug);
             }
 
             window.addEventListener("popstate", () => {
-                const path = window.location.pathname;
-                const parts = path.split("/");
+                const parts = window.location.pathname.split("/").slice(1);
 
-                if (parts[2] === "list") {
-                    loadList(parts[1], parts[3]);
+                const name = parts[0];
+                const slug = parts[1];
+
+                if (name && slug) {
+                    loadList(name, slug);
                 } else {
                     renderSavedLists();
                 }
@@ -126,7 +128,7 @@
                 auth.savedLists = data.lists;
                 document.getElementById("searchForm").style.display = "none";
                 document.getElementById("header").innerHTML = `
-                    <button onclick="document.getElementById('searchForm').classList.toggle('block')">Search</button>
+                    <button id="searchToggle" onclick="document.getElementById('searchForm').classList.toggle('block')">Search</button>
                     <p>Welcome, ${auth.name}!</p>
                 `;
                 document.getElementById("modal").remove();
@@ -159,21 +161,21 @@
                 const container = document.getElementById("results");
                 container.innerHTML = "<h2>Saved Lists</h2>";
 
-                if (!Array.isArray(auth.savedLists[0]) || auth.savedLists[0].length === 0) {
+                if (!Array.isArray(auth.savedLists) || auth.savedLists.length === 0) {
                     container.innerHTML += "<p>No saved lists found.</p>";
                     return;
                 }
-                [...auth.savedLists[0]].reverse().forEach((list) => {
+                [...auth.savedLists].reverse().forEach((list) => {
                     const listTitle = document.createElement("a");
                     listTitle.className = "list-title";
                     listTitle.textContent = list.title;
-                    listTitle.href = `/${auth.name}/list/${list.id}`;
+                    listTitle.href = `/${auth.name}/${list.slug}`;
                     listTitle.addEventListener("click", (e) => {
                         e.preventDefault();
 
                         history.pushState({}, "", listTitle.href);
 
-                        loadList(auth.name, list.id);
+                        loadList(auth.name, list.slug);
                     });
                     container.appendChild(listTitle);
 
@@ -403,22 +405,35 @@
                         body: JSON.stringify({
                             user_id: auth.userId,
                             title,
+                            slug: slugify(title),
                             list: auth.currentList
                         })
                     });
 
+                    const res = await fetch(`/api/user/${auth.name}`);
+                    auth.savedLists = await res.json();
+
                     alert("List saved!");
+                    document.getElementById("searchToggle").click();
                     renderSavedLists();
                 });
 
                 container.appendChild(button);
             }
 
-            async function loadList(name, id) {
-                const res = await fetch(`/api/${name}/list/${id}`);
+            async function loadList(name, slug) {
+                const res = await fetch(`/api/${name}/${slug}`);
                 const data = await res.json();
 
                 renderShareableList(name, data);
+            }
+
+            function slugify(title) {
+                return title
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^\w-]/g, "");
             }
         </script>
     </body>

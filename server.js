@@ -24,11 +24,33 @@ const { getResults } = require('./apis/zillow-realtyapi');
             }
         }, 4 * 60 * 1000);
 
+
 		app.use(express.static(path.join(__dirname, "public")));
 		app.use(express.json());
 
 		app.get("/", (req, res) => {
 			res.sendFile(path.join(__dirname, "public", "index.html"));
+		});
+
+		app.get("/api/user/:name", async (req, res) => {
+			try {
+				const { name } = req.params;
+
+				const [lists] = await db.query(
+					`
+					SELECT lists.*
+					FROM lists
+					JOIN users ON lists.user_id = users.id
+					WHERE users.name = ?
+					`,
+					[name]
+				);
+
+				res.json(lists);
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to search' });
+			}
 		});
 
 		app.post("/api/login", async (req, res) => {
@@ -46,7 +68,8 @@ const { getResults } = require('./apis/zillow-realtyapi');
 					if (user.length > 0) {
 						const bool = bcrypt.compareSync(password, user[0].password);
 						if (bool) {
-							const lists = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [user[0].id]);
+							const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [user[0].id]);
+
 							res.json({
 								user: {
 									id: user[0].id,
@@ -63,6 +86,7 @@ const { getResults } = require('./apis/zillow-realtyapi');
 
 						const [insertResult] = await db.query(`INSERT INTO users (name, password) VALUES (?, ?)`, [nick, hash]);
 						const [lists] = await db.query(`SELECT * FROM lists WHERE user_id = ?`, [insertResult.insertId]);
+
 						res.json({
 							user: {
 								id: insertResult.insertId,
@@ -75,7 +99,7 @@ const { getResults } = require('./apis/zillow-realtyapi');
 				}
 			} catch (error) {
 				console.error('API route error:', error);
-				res.status(500).json({ error: 'Failed to fetch data' });
+				res.status(500).json({ error: 'Failed to login' });
 			}
 		});
 
@@ -87,42 +111,53 @@ const { getResults } = require('./apis/zillow-realtyapi');
 				res.json(result);
 			} catch (error) {
 				console.error('API route error:', error);
-				res.status(500).json({ error: 'Failed to fetch data' });
+				res.status(500).json({ error: 'Failed to search' });
 			}
 		});
 
 		app.post("/api/save-list", async (req, res) => {
 			try {
-				const { user_id, title, list } = req.body;
+				const { user_id, title, slug, list } = req.body;
 
-				await db.query(`INSERT INTO lists (user_id, title, list) VALUES (?, ?, ?)`, [user_id, title, JSON.stringify(list)]);
+				const [result] = await db.query(`INSERT INTO lists (user_id, title, slug, list) VALUES (?, ?, ?, ?)`, [user_id, title, slug, JSON.stringify(list)]);
 
-				res.json({ success: true });
+				res.json({
+					id: result.insertId,
+					user_id,
+					title,
+					slug,
+					list
+				});
 			} catch (error) {
 				console.error('API route error:', error);
 				res.status(500).json({ error: 'Failed to save list' });
 			}
 		});
 
-		app.get("/:name/list/:id", async (req, res) => {
-			res.sendFile(path.join(__dirname, "public", "index.html"));
+		app.get("/api/:name/:slug", async (req, res) => {
+			try {
+				const { name, slug } = req.params;
+
+				const [rows] = await db.query(
+					`
+					SELECT lists.title, lists.list
+					FROM lists
+					JOIN users ON lists.user_id = users.id
+					WHERE users.name = ?
+					AND lists.slug = ?
+					`,
+					[name, slug]
+				);
+
+				res.json(rows[0]);
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to fetch endpoint' });
+			}
 		});
 
-		app.get("/api/:name/list/:id", async (req, res) => {
-			const { name, id } = req.params;
-
-			const [rows] = await db.query(
-				`
-				SELECT lists.id, lists.title, lists.list
-				FROM lists
-				JOIN users ON lists.user_id = users.id
-				WHERE users.name = ?
-				AND lists.id = ?
-				`,
-				[name, id]
-			);
-
-			res.json(rows[0]);
+		app.get("/:name/:slug", async (req, res) => {
+			res.sendFile(path.join(__dirname, "public", "index.html"));
 		});
 
 		app.listen(port, () => {

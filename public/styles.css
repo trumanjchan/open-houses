@@ -91,6 +91,14 @@ input {
 
 	#home-btn {
 		display: none;
+		
+		img {
+			transform: scale(1);
+    		transition: transform 0.2s ease;
+		}
+	}
+	#home-btn img:hover {
+		transform: scale(1.1);
 	}
 
 	#signup-or-login-btn {
