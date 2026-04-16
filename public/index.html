@@ -7,6 +7,8 @@
         <link rel="stylesheet" href="/styles.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     </head>
 
     <body>
@@ -16,7 +18,7 @@
                     <input type="text" id="username" name="username" placeholder="username" autocomplete="off" required>
                     <input type="password" id="password" name="password" placeholder="password" autocomplete="off" required>
                     <button type="submit" id="continue-btn" aria-label="Continue">
-                        <img src="/assets/transfer-in.svg" alt="" width="30px" />
+                        <img src="/assets/transfer-in.svg" alt="" width="30px" draggable="false" />
                     </button>
                 </form>
             </div>
@@ -24,10 +26,10 @@
         
         <div id="header">
             <a id="home-btn" href="/" aria-label="Home">
-                <img src="/assets/door.svg" alt="" width="30px" />
+                <img src="/assets/door.svg" alt="" width="30px" draggable="false" />
             </a>
             <button id="signup-or-login-btn" onclick="document.getElementById('modal').style.visibility='visible';" aria-label="Sign up or log in">
-                <img src="/assets/key.svg" alt="" width="30px" />
+                <img src="/assets/key.svg" alt="" width="30px" draggable="false" />
             </button>
         </div>
 
@@ -63,7 +65,7 @@
                 </div>
             </fieldset>
             <button type="submit" id="search-btn" aria-label="Search">
-                <img src="/assets/search.svg" alt="" width="30px" />
+                <img src="/assets/search.svg" alt="" width="30px" draggable="false" />
             </button>
         </form>
 
@@ -94,7 +96,7 @@
 
                 if (name && slug) {
                     loadList(name, slug);
-                } else {
+                } else if (auth.loggedIn) {
                     renderSavedLists();
                 }
             });
@@ -163,7 +165,7 @@
                 container.innerHTML = "<h2>Saved Lists</h2>";
 
                 if (!Array.isArray(auth.savedLists) || auth.savedLists.length === 0) {
-                    container.innerHTML += "<p>No saved lists found.</p>";
+                    container.innerHTML += "<h4>No saved lists found.</h4>";
                     return;
                 }
                 [...auth.savedLists].reverse().forEach((list) => {
@@ -289,7 +291,7 @@
                 container.appendChild(card);
 
                 if (!Array.isArray(data?.searchResults) || data.searchResults.length === 0) {
-                    container.innerHTML = "<p>No search results found.</p>";
+                    container.innerHTML = "<h4>No search results found.</h4>";
                     return;
                 }
                 data.searchResults.forEach((listing) => {
