@@ -1,5 +1,18 @@
 body {
 	margin: 0;
+	font-family: 'Red Hat Display', sans-serif;
+}
+
+h1, h2, h3, h4, label, legend {
+	font-weight: bold;
+}
+
+fieldset label {
+    font-weight: normal;
+}
+
+a {
+	text-underline-offset: 8px;
 }
 
 h4 {
