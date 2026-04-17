@@ -311,6 +311,8 @@
                     if (auth.loggedIn) {
                         const checkbox = document.createElement("input");
                         checkbox.type = "checkbox";
+                        const id = `save-${zpid}`;
+                        checkbox.id = id;
 
                         checkbox.addEventListener("change", () => {
                             if (checkbox.checked) {
@@ -322,6 +324,7 @@
 
                         const label = document.createElement("label");
                         label.textContent = " Save to list";
+                        label.setAttribute("for", id);
 
                         const wrapper = document.createElement("div");
                         wrapper.appendChild(checkbox);
@@ -330,6 +333,34 @@
                         card.appendChild(wrapper);
                     }
                     container.appendChild(card);
+
+                    const openHouseShowingList = listing.property?.openHouseShowingList;
+                    if (openHouseShowingList) {
+                        const openHouseInfo = document.createElement("div");
+                        openHouseInfo.className = "open-house-info";
+
+                        openHouseShowingList.forEach(showing => {
+                            const start = new Date(showing.startTime);
+                            const end = new Date(showing.endTime);
+
+                            const date = start.toLocaleDateString([], {
+                                dateStyle: "medium"
+                            });
+
+                            const startTime = start.toLocaleTimeString([], {
+                                timeStyle: "short"
+                            });
+
+                            const endTime = end.toLocaleTimeString([], {
+                                timeStyle: "short"
+                            });
+
+                            openHouseInfo.innerHTML += `
+                                <p>${date} ~ ${startTime} - ${endTime}</p>
+                            `;
+                        });
+                        card.appendChild(openHouseInfo);
+                    }
                 });
             }
 
