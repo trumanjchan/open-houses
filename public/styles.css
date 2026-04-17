@@ -189,7 +189,26 @@ h2 {
   	margin: 40px auto 0 auto;
 }
 
-.listing-card {
+.cards {
+	position: relative;
+
+	#save-list-ui {
+		display: flex;
+  		justify-content: center;
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+
+		button {
+			margin: 10px 0;
+		}
+	}
+}
+
+.card {
 	border: 1px solid #ddd;
 	padding: 16px 20px;
 	margin: 20px;
@@ -242,7 +261,15 @@ h2 {
 	7.5% { transform: rotate(-5deg); }
 }
 
-.shareable-page #searchForm {
+.toggle-active #search {
+	display: block !important;
+}
+
+.toggle-active #saved {
+	display: none;
+}
+
+.shareable-page #search {
 	display: none;
 }
 
@@ -252,7 +279,7 @@ h2 {
 
 
 @media only screen and (max-width: 768px) {
-	.listing-card {
+	.card {
 		padding: 16px;
 	}
 }

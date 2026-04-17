@@ -39,36 +39,41 @@
             </button>
         </div>
 
-        <form id="searchForm" onsubmit="search(event)">
-            <div class="flex-col">
-                <label for="location">City or ZIP Code</label>
-                <input type="text" id="location" name="location" value="San Francisco" required>
-            </div>
-            <div class="flex-col">
-                <label for="min">Min</label>
-                <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="min" name="min" value="400000" required>
-                <label for="max">Max</label>
-                <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="max" name="max" value="700000" required>
-            </div>
-            <fieldset>
-                <legend>Tours:</legend>
-
-                <div>
-                    <input class="checkbox" type="checkbox" id="tourOpenHouse" name="tourOpenHouse" checked />
-                    <label for="tourOpenHouse">Must have open house</label>
+        <section id="search">
+            <form id="searchForm" onsubmit="search(event)">
+                <div class="flex-col">
+                    <label for="location">City or ZIP Code</label>
+                    <input type="text" id="location" name="location" value="San Francisco" required>
                 </div>
-
-                <div>
-                    <input class="checkbox" type="checkbox" id="tour3D" name="tour3D" />
-                    <label for="tour3D">Must have 3D Tour</label>
+                <div class="flex-col">
+                    <label for="min">Min</label>
+                    <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="min" name="min" value="400000" required>
+                    <label for="max">Max</label>
+                    <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="max" name="max" value="700000" required>
                 </div>
-            </fieldset>
-            <button type="submit" id="search-btn" aria-label="Search">
-                <img src="/assets/search.svg" alt="" width="30px" draggable="false" />
-            </button>
-        </form>
+                <fieldset>
+                    <legend>Tours:</legend>
 
-        <div id="results"></div>
+                    <div>
+                        <input class="checkbox" type="checkbox" id="tourOpenHouse" name="tourOpenHouse" checked />
+                        <label for="tourOpenHouse">Must have open house</label>
+                    </div>
+
+                    <div>
+                        <input class="checkbox" type="checkbox" id="tour3D" name="tour3D" />
+                        <label for="tour3D">Must have 3D Tour</label>
+                    </div>
+                </fieldset>
+                <button type="submit" id="search-btn" aria-label="Search">
+                    <img src="/assets/search.svg" alt="" width="30px" draggable="false" />
+                </button>
+            </form>
+
+            <div id="results"></div>
+        </section>
+
+        <section id="saved"></section>
+
 
         <script>
             const auth = {
@@ -78,6 +83,7 @@
                 currentList: [],
                 savedLists: []
             };
+            let searchList = [];
 
             const parts = window.location.pathname.split("/").slice(1);
             const name = parts[0];
@@ -128,13 +134,17 @@
                 auth.userId = data.user.id;
                 auth.currentList = [];
                 auth.savedLists = data.lists;
-                document.getElementById("searchForm").style.display = "none";
+                document.getElementById("search").style.display = "none";
                 document.getElementById("header").innerHTML = `
-                    <button id="searchToggle" onclick="document.getElementById('searchForm').classList.toggle('block')">Search</button>
+                    <button id="toggle" onclick="document.body.classList.toggle('toggle-active'); this.innerText = this.innerText === 'Search' ? 'Saved' : 'Search';">Search</button>
                     <p>Welcome, ${auth.name}!</p>
                 `;
                 document.getElementById("modal").remove();
+
                 renderSavedLists();
+                if (Array.isArray(searchList) && searchList.length > 0) {
+                    renderListings(searchList);
+                }
             }
 
             async function search(e) {
@@ -153,13 +163,16 @@
                 });
 
                 const data = await res.json();
+                searchList = data;
 
                 renderListings(data);
             }
 
 
             function renderSavedLists() {
-                const container = document.getElementById("results");
+                window.scrollTo(0, 0);
+
+                const container = document.getElementById("saved");
                 container.innerHTML = "<h2>Saved Lists</h2>";
 
                 if (!Array.isArray(auth.savedLists) || auth.savedLists.length === 0) {
@@ -182,7 +195,7 @@
 
                     list.list.forEach((listing) => {
                         const card = document.createElement("div");
-                        card.className = "listing-card";
+                        card.className = "card";
 
                         const zpid = listing.zpid;
                         if (!zpid) {
@@ -219,14 +232,14 @@
                     document.getElementById("home-btn").style.display = "block";
                 }
 
-                const container = document.getElementById("results");
+                const container = document.getElementById("saved");
                 container.innerHTML = `
                     <h2>${name}'s list: ${data.title}</h2>
                 `;
 
                 data.list.forEach((listing) => {
                     const card = document.createElement("div");
-                    card.className = "listing-card";
+                    card.className = "card";
 
                     const zpid = listing.zpid;
                     if (!zpid) {
@@ -259,23 +272,28 @@
                 const container = document.getElementById("results");
                 container.innerHTML = "";
 
-                const card = document.createElement("h4");
-                card.innerHTML = `
+                const searchInfo = document.createElement("h4");
+                searchInfo.innerHTML = `
                     <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
                     <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
                     <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
-                    <div id="save-list-ui"></div>
                 `;
-                container.appendChild(card);
+                container.appendChild(searchInfo);
+
+                const cards = document.createElement("div");
+                cards.className = "cards";
+
+                const saveListUI = document.createElement("div");
+                saveListUI.id = "save-list-ui";
+                cards.appendChild(saveListUI);
 
                 if (!Array.isArray(data?.searchResults) || data.searchResults.length === 0) {
                     container.innerHTML = "<h4>No search results found.</h4>";
                     return;
                 }
                 data.searchResults.forEach((listing) => {
-                    //console.log(listing.property.media.propertyPhotoLinks.mediumSizeLink);  //for later: add photo to the listing cards
                     const card = document.createElement("div");
-                    card.className = "listing-card";
+                    card.className = "card";
 
                     const zpid = listing.property?.zpid;
                     if (!zpid) {
@@ -297,7 +315,7 @@
                         <div class="fade"></div>
                         ${ listing.property?.location?.latitude != null && listing.property?.location?.longitude != null ? `<div id="${mapId}" class="map" data-lat="${listing.property.location.latitude}" data-lng="${listing.property.location.longitude}"></div>`: "" }
                     `;
-                    container.appendChild(card);
+                    cards.appendChild(card);
 
                     const mapEl = card.querySelector(".map");
                     if (mapEl) {
@@ -309,6 +327,7 @@
                         checkbox.type = "checkbox";
                         const id = `save-${zpid}`;
                         checkbox.id = id;
+                        checkbox.className = "save-card-checkbox";
 
                         checkbox.addEventListener("change", () => {
                             if (checkbox.checked) {
@@ -328,7 +347,6 @@
 
                         card.appendChild(wrapper);
                     }
-                    container.appendChild(card);
 
                     const openHouseShowingList = listing.property?.openHouseShowingList;
                     if (openHouseShowingList) {
@@ -357,6 +375,8 @@
                         });
                         card.appendChild(openHouseInfo);
                     }
+
+                    container.appendChild(cards);
                 });
             }
 
@@ -416,7 +436,9 @@
                     auth.savedLists = await res.json();
 
                     alert("List saved!");
-                    document.getElementById("searchToggle").click();
+                    auth.currentList = [];
+                    document.querySelectorAll(".save-list-checkbox:checked").forEach(cb => cb.checked = false);
+                    document.getElementById("toggle").click();
                     renderSavedLists();
                 });
 
