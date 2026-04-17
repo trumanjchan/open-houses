@@ -228,6 +228,12 @@ h2 {
 	}
 }
 
+.open-house-info {
+	p {
+		font-variant-numeric: tabular-nums;
+	}
+}
+
 
 @keyframes jiggle {
 	0%, 10%, 100% { transform: rotate(0deg); }

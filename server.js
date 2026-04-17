@@ -105,9 +105,9 @@ const { getResults } = require('./apis/zillow-realtyapi');
 
 		app.post("/api/search", async (req, res) => {
 			try {
-				const { location, listingstatus, min, max, tourOpenHouse, tour3D } = req.body;
+				const { location, min, max, tourOpenHouse, tour3D } = req.body;
 
-				const result = await getResults(location, listingstatus, min, max, tourOpenHouse, tour3D);
+				const result = await getResults(location, min, max, tourOpenHouse, tour3D);
 				res.json(result);
 			} catch (error) {
 				console.error('API route error:', error);

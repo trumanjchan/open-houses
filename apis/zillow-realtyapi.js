@@ -5,7 +5,7 @@ dotenv.config();
 
 const url = "https://zillow.realtyapi.io/search/byaddress";
 
-const getResults = async (location, listingstatus, min, max, tourOpenHouse, tour3D) => {
+const getResults = async (location, min, max, tourOpenHouse, tour3D) => {
 	try {
 		const tours = [];
 		if (tourOpenHouse) {
@@ -26,19 +26,9 @@ const getResults = async (location, listingstatus, min, max, tourOpenHouse, tour
 				location: location,
 				page: "1",
 				sortOrder: "Price_Low_to_High",
-				listingStatus: listingstatus,
-				bed_min: "No_Min",
-				bed_max: "No_Max",
-				bathrooms: "Any",
-				homeType: "Houses, Townhomes, Multi-family, Condos/Co-ops, Apartments, Manufactured",
-				maxHOA: "Any",
-				listingType: "Any",
-				parkingSpots: "Any",
-				mustHaveBasement: "No",
-				daysOnZillow: "Any",
-				soldInLast: "Any",
+				listingStatus: "For_Sale",
 				listPriceRange: `min:${min}, max:${max}`,
-				tours: tours.length > 0 ? tours.join(", ") : ""
+				...(tours.length > 0 && { tours: tours.join(", ") })
 			}
 		};
 

@@ -44,13 +44,6 @@
                 <label for="location">City or ZIP Code</label>
                 <input type="text" id="location" name="location" value="San Francisco" required>
             </div>
-            <div>
-                <select id="listingstatus" name="listingstatus" aria-label="listingstatus" required>
-                    <option selected disabled value="">Listing Status</option>
-                    <option value="For_Sale">Sale</option>
-                    <option value="For_Rent">Rent</option>
-                </select>
-            </div>
             <div class="flex-col">
                 <label for="min">Min</label>
                 <input class="no-spinner" type="number" inputmode="numeric" pattern="[0-9]*" id="min" name="min" value="400000" required>
@@ -148,7 +141,6 @@
                 e.preventDefault();
                 
                 const location = document.getElementById("location").value;
-                const listingstatus = document.getElementById("listingstatus").value;
                 const min = document.getElementById("min").value;
                 const max = document.getElementById("max").value;
                 const tourOpenHouse = document.getElementById("tourOpenHouse").checked;
@@ -157,7 +149,7 @@
                 const res = await fetch("/api/search", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ location, listingstatus, min, max, tourOpenHouse, tour3D }),
+                    body: JSON.stringify({ location, min, max, tourOpenHouse, tour3D }),
                 });
 
                 const data = await res.json();
@@ -221,6 +213,8 @@
             }
 
             function renderShareableList(name, data) {
+                window.scrollTo(0, 0);
+                
                 if (document.getElementById("home-btn")) {
                     document.getElementById("home-btn").style.display = "block";
                 }
@@ -306,7 +300,9 @@
                     container.appendChild(card);
 
                     const mapEl = card.querySelector(".map");
-                    observer.observe(mapEl);
+                    if (mapEl) {
+                        observer.observe(mapEl);
+                    }
 
                     if (auth.loggedIn) {
                         const checkbox = document.createElement("input");
