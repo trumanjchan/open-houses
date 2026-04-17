@@ -142,7 +142,8 @@
                 document.getElementById("modal").remove();
 
                 renderSavedLists();
-                if (Array.isArray(searchList) && searchList.length > 0) {
+                renderListings(searchList);
+                if (searchList.length > 0) {
                     renderListings(searchList);
                 }
             }
@@ -437,7 +438,8 @@
 
                     alert("List saved!");
                     auth.currentList = [];
-                    document.querySelectorAll(".save-list-checkbox:checked").forEach(cb => cb.checked = false);
+                    document.querySelectorAll(".save-card-checkbox:checked").forEach(cb => cb.checked = false);
+                    renderSaveListButton();
                     document.getElementById("toggle").click();
                     renderSavedLists();
                 });
