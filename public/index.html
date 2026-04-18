@@ -171,7 +171,7 @@
 
 
             function renderSavedLists() {
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: "smooth" });
 
                 const container = document.getElementById("saved");
                 container.innerHTML = "<h2>Saved Lists</h2>";
@@ -191,6 +191,7 @@
                         history.pushState({}, "", listTitle.href);
 
                         loadList(auth.name, list.slug);
+                        window.scrollTo(0, 0);
                     });
                     container.appendChild(listTitle);
 
@@ -222,13 +223,39 @@
 
                         const mapEl = card.querySelector(".map");
                         observer.observe(mapEl);
+
+                        const openHouseShowingList = listing.showings;
+                        if (openHouseShowingList) {
+                            const openHouseInfo = document.createElement("div");
+                            openHouseInfo.className = "open-house-info";
+
+                            openHouseShowingList.forEach(showing => {
+                                const start = new Date(showing.startTime);
+                                const end = new Date(showing.endTime);
+
+                                const date = start.toLocaleDateString([], {
+                                    dateStyle: "medium"
+                                });
+
+                                const startTime = start.toLocaleTimeString([], {
+                                    timeStyle: "short"
+                                });
+
+                                const endTime = end.toLocaleTimeString([], {
+                                    timeStyle: "short"
+                                });
+
+                                openHouseInfo.innerHTML += `
+                                    <p>${date} ~ ${startTime} - ${endTime}</p>
+                                `;
+                            });
+                            card.appendChild(openHouseInfo);
+                        }
                     });
                 });
             }
 
             function renderShareableList(name, data) {
-                window.scrollTo(0, 0);
-                
                 if (document.getElementById("home-btn")) {
                     document.getElementById("home-btn").style.display = "block";
                 }
@@ -266,6 +293,34 @@
 
                     const mapEl = card.querySelector(".map");
                     observer.observe(mapEl);
+
+                    const openHouseShowingList = listing.showings;
+                    if (openHouseShowingList) {
+                        const openHouseInfo = document.createElement("div");
+                        openHouseInfo.className = "open-house-info";
+
+                        openHouseShowingList.forEach(showing => {
+                            const start = new Date(showing.startTime);
+                            const end = new Date(showing.endTime);
+
+                            const date = start.toLocaleDateString([], {
+                                dateStyle: "medium"
+                            });
+
+                            const startTime = start.toLocaleTimeString([], {
+                                timeStyle: "short"
+                            });
+
+                            const endTime = end.toLocaleTimeString([], {
+                                timeStyle: "short"
+                            });
+
+                            openHouseInfo.innerHTML += `
+                                <p>${date} ~ ${startTime} - ${endTime}</p>
+                            `;
+                        });
+                        card.appendChild(openHouseInfo);
+                    }
                 });
             }
 
@@ -389,7 +444,8 @@
                     type: listing.property?.propertyType,
                     sqft: listing.property?.livingArea,
                     latitude: listing.property?.location?.latitude,
-                    longitude: listing.property?.location?.longitude
+                    longitude: listing.property?.location?.longitude,
+                    showings: listing.property?.openHouseShowingList
                 });
 
                 renderSaveListButton();
