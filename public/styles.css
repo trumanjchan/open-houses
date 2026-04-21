@@ -21,6 +21,7 @@ h4 {
 
 input {
 	text-align: center;
+	font-size: 16px;
 }
 
 /* Chrome, Safari, Edge */
@@ -32,6 +33,10 @@ input {
 /* Firefox */
 .no-spinner {
   -moz-appearance: textfield;
+}
+
+button, a[href] {
+	touch-action: manipulation;
 }
 
 
@@ -49,6 +54,21 @@ img, label, legend {
 	-webkit-user-drag: none;
 	-webkit-touch-callout: none;
 	user-select: none;
+}
+
+.btn-img {
+	background: none;
+	border: none;
+	cursor: pointer;
+
+	img {
+		transform: scale(1);
+		transition: transform 0.2s ease;
+
+		&:hover {
+			transform: scale(1.1);
+		}
+	}
 }
 
 
@@ -86,18 +106,6 @@ img, label, legend {
 				width: fit-content;
   				display: flex;
 				margin: auto;
-
-				background: none;
-    			border: none;
-				cursor: pointer;
-
-				img {
-					transform: scale(1);
-					transition: transform 0.2s ease;
-				}
-			}
-			#continue-btn img:hover {
-				transform: scale(1.1);
 			}
 		}
 	}
@@ -114,31 +122,11 @@ img, label, legend {
 
 	#home-btn {
 		display: none;
-		
-		img {
-			transform: scale(1);
-    		transition: transform 0.2s ease;
-		}
-	}
-	#home-btn img:hover {
-		transform: scale(1.1);
 	}
 
 	#signup-or-login-btn {
 		margin-left: auto;
 		animation: jiggle 5s ease-in-out infinite;
-
-		background: none;
-    	border: none;
-		cursor: pointer;
-
-		img {
-			transform: scale(1);
-    		transition: transform 0.2s ease;
-		}
-	}
-	#signup-or-login-btn img:hover {
-		transform: scale(1.1);
 	}
 }
 
@@ -161,20 +149,6 @@ img, label, legend {
 			width: fit-content;
   			margin: auto;
 		}
-	}
-
-	#search-btn {
-		background: none;
-    	border: none;
-		cursor: pointer;
-
-		img {
-			transform: scale(1);
-    		transition: transform 0.2s ease;
-		}
-	}
-	#search-btn img:hover {
-		transform: scale(1.1);
 	}
 }
 
@@ -215,19 +189,14 @@ img, label, legend {
 			margin: 40px auto 0 auto;
 		}
 
-		.delete {
+		#trash-btn {
 			position: absolute;
 			top: 0;
 			right: 0;
 			bottom: 0;
 			margin: auto 20px auto 0;
-
-			transform: scale(1);
-    		transition: transform 0.2s ease;
-			cursor: pointer;
-		}
-		.delete:hover {
-			transform: scale(1.1);
+			display: flex;
+			place-items: center;
 		}
 	}
 }
@@ -285,12 +254,14 @@ img, label, legend {
 	7.5% { transform: rotate(-5deg); }
 }
 
-.toggle-active #search {
-	display: block !important;
-}
+.toggle-active {
+	#search {
+		display: block !important;
+	}
 
-.toggle-active #saved {
-	display: none;
+	#saved {
+		display: none;
+	}
 }
 
 .shareable-page #search {

@@ -23,7 +23,7 @@
                 <form id="loginForm" onsubmit="login(event)">
                     <input type="text" id="username" name="username" placeholder="username" autocomplete="off" required>
                     <input type="password" id="password" name="password" placeholder="password" autocomplete="off" required>
-                    <button type="submit" id="continue-btn" aria-label="Continue">
+                    <button type="submit" id="continue-btn" class="btn-img" aria-label="Continue">
                         <img src="/assets/transfer-in.svg" alt="" width="30px" draggable="false" />
                     </button>
                 </form>
@@ -31,10 +31,10 @@
         </div>
         
         <div id="header">
-            <a id="home-btn" href="/" aria-label="Home">
+            <a id="home-btn" class="btn-img" href="/" aria-label="Home">
                 <img src="/assets/door.svg" alt="" width="30px" draggable="false" />
             </a>
-            <button id="signup-or-login-btn" onclick="document.getElementById('modal').style.visibility='visible';" aria-label="Sign up or log in">
+            <button id="signup-or-login-btn" class="btn-img" onclick="document.getElementById('modal').style.visibility='visible';" aria-label="Sign up or log in">
                 <img src="/assets/key.svg" alt="" width="30px" draggable="false" />
             </button>
         </div>
@@ -64,7 +64,7 @@
                         <label for="tour3D">Must have 3D Tour</label>
                     </div>
                 </fieldset>
-                <button type="submit" id="search-btn" aria-label="Search">
+                <button type="submit" id="search-btn" class="btn-img" aria-label="Search">
                     <img src="/assets/search.svg" alt="" width="30px" draggable="false" />
                 </button>
             </form>
@@ -136,7 +136,7 @@
                 auth.savedLists = data.lists;
                 document.getElementById("search").style.display = "none";
                 document.getElementById("header").innerHTML = `
-                    <button id="toggle" onclick="document.body.classList.toggle('toggle-active'); this.innerText = this.innerText === 'Search' ? 'Saved' : 'Search';">Search</button>
+                    <button id="toggle-btn" onclick="document.body.classList.toggle('toggle-active'); this.innerText = this.innerText === 'Search' ? 'Saved' : 'Search';">Search</button>
                     <p>Welcome, ${auth.name}!</p>
                 `;
                 document.getElementById("modal").remove();
@@ -197,11 +197,15 @@
                     });
                     controls.appendChild(title);
 
-                    const trash = document.createElement("img");
-                    trash.className = "delete";
-                    trash.src = "/assets/trash.svg";
-                    trash.onclick = () => deleteSavedList(list.id);
-                    controls.appendChild(trash);
+                    const trashBtn = document.createElement("button");
+                    trashBtn.id = "trash-btn";
+                    trashBtn.className = "btn-img";
+                    trashBtn.ariaLabel = "Delete";
+                    trashBtn.innerHTML = `
+                        <img src="/assets/trash.svg" alt="" width="24px" height="24px" draggable="false" />
+                    `;
+                    trashBtn.onclick = () => deleteSavedList(list.id);
+                    controls.appendChild(trashBtn);
 
                     savedList.appendChild(controls);
 
@@ -511,7 +515,7 @@
                     auth.currentList = [];
                     document.querySelectorAll(".save-card-checkbox:checked").forEach(cb => cb.checked = false);
                     renderSaveListButton();
-                    document.getElementById("toggle").click();
+                    document.getElementById("toggle-btn").click();
                     renderSavedLists();
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 });
