@@ -452,7 +452,22 @@
             }
 
             async function deleteSavedList(listId) {
-                console.log(listId);
+                const res = await fetch(`/api/${auth.userId}/${listId}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+
+                    if (data.affectedRows > 0) {
+                        const res = await fetch(`/api/user/${auth.name}`);
+                        auth.savedLists = await res.json();
+
+                        renderSavedLists();
+                    }
+                } else {
+                    console.error("Server error:", res.status);
+                }
             }
 
             function addToList(listing) {

@@ -1,6 +1,20 @@
 body {
 	margin: 0;
 	font-family: 'Red Hat Display', sans-serif;
+
+	&.toggle-active {
+		#search {
+			display: block !important;
+		}
+
+		#saved {
+			display: none;
+		}
+	}
+
+	&.shareable-page #search {
+		display: none;
+	}
 }
 
 h1, h2, h3, h4, label, legend {
@@ -132,13 +146,14 @@ img, label, legend {
 
 #searchForm {
 	text-align: center;
+	width: fit-content;
+	margin: auto;
 
 	> * {
 		margin: 10px 0;
 	}
 	
 	fieldset {
-		width: fit-content;
 		margin: auto;
 
 		> div {
@@ -252,24 +267,6 @@ img, label, legend {
 	2.5% { transform: rotate(-5deg); }
 	5% { transform: rotate(5deg); }
 	7.5% { transform: rotate(-5deg); }
-}
-
-.toggle-active {
-	#search {
-		display: block !important;
-	}
-
-	#saved {
-		display: none;
-	}
-}
-
-.shareable-page #search {
-	display: none;
-}
-
-.block {
-	display: block !important;
 }
 
 

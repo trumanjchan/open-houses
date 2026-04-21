@@ -160,6 +160,25 @@ const { getResults } = require('./apis/zillow-realtyapi');
 			res.sendFile(path.join(__dirname, "public", "index.html"));
 		});
 
+		app.delete("/api/:userId/:listId", async (req, res) => {
+			try {
+				const { userId, listId } = req.params;
+
+				const [result] = await db.query(
+					`
+					DELETE FROM lists
+					WHERE user_id = ? AND id = ?
+					`,
+					[userId, listId]
+				);
+
+				res.json(result);
+			} catch (error) {
+				console.error('API route error:', error);
+				res.status(500).json({ error: 'Failed to delete list' });
+			}
+		});
+
 		app.listen(port, () => {
 			console.log(`Server listening on port ${port}`);
 		});
