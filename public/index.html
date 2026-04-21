@@ -142,7 +142,6 @@
                 document.getElementById("modal").remove();
 
                 renderSavedLists();
-                renderListings(searchList);
                 if (searchList.length > 0) {
                     renderListings(searchList);
                 }
@@ -171,8 +170,6 @@
 
 
             function renderSavedLists() {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-
                 const container = document.getElementById("saved");
                 container.innerHTML = "<h2>Saved Lists</h2>";
 
@@ -197,7 +194,6 @@
                         history.pushState({}, "", title.href);
 
                         loadList(auth.name, list.slug);
-                        window.scrollTo(0, 0);
                     });
                     controls.appendChild(title);
 
@@ -527,6 +523,7 @@
                 const data = await res.json();
 
                 renderShareableList(name, data);
+                window.scrollTo(0, 0);
             }
 
             function slugify(title) {
