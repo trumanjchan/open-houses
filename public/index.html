@@ -181,19 +181,33 @@
                     return;
                 }
                 [...auth.savedLists].reverse().forEach((list) => {
-                    const listTitle = document.createElement("a");
-                    listTitle.className = "list-title";
-                    listTitle.textContent = list.title;
-                    listTitle.href = `/${auth.name}/${list.slug}`;
-                    listTitle.addEventListener("click", (e) => {
+                    const savedList = document.createElement("div");
+                    savedList.classList = "saved-list";
+
+                    const controls = document.createElement("div");
+                    controls.classList = "controls";
+
+                    const title = document.createElement("a");
+                    title.className = "title";
+                    title.textContent = list.title;
+                    title.href = `/${auth.name}/${list.slug}`;
+                    title.addEventListener("click", (e) => {
                         e.preventDefault();
 
-                        history.pushState({}, "", listTitle.href);
+                        history.pushState({}, "", title.href);
 
                         loadList(auth.name, list.slug);
                         window.scrollTo(0, 0);
                     });
-                    container.appendChild(listTitle);
+                    controls.appendChild(title);
+
+                    const trash = document.createElement("img");
+                    trash.className = "delete";
+                    trash.src = "/assets/trash.svg";
+                    trash.onclick = () => deleteSavedList(list.id);
+                    controls.appendChild(trash);
+
+                    savedList.appendChild(controls);
 
                     list.list.forEach((listing) => {
                         const card = document.createElement("div");
@@ -219,7 +233,7 @@
                             <div class="fade"></div>
                             ${ listing.latitude != null && listing.longitude != null ? `<div id="${mapId}" class="map" data-lat="${listing.latitude}" data-lng="${listing.longitude}"></div>`: "" }
                         `;
-                        container.appendChild(card);
+                        savedList.appendChild(card);
 
                         const mapEl = card.querySelector(".map");
                         observer.observe(mapEl);
@@ -251,6 +265,7 @@
                             });
                             card.appendChild(openHouseInfo);
                         }
+                        container.appendChild(savedList);
                     });
                 });
             }
@@ -434,6 +449,10 @@
 
                     container.appendChild(cards);
                 });
+            }
+
+            async function deleteSavedList(listId) {
+                console.log(listId);
             }
 
             function addToList(listing) {

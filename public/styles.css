@@ -178,72 +178,96 @@ img, label, legend {
 	}
 }
 
-h2 {
-	margin: 20px 20px 0 20px;
-}
+#results {
+	.cards {
+		position: relative;
 
-.list-title {
-	font-size: 24px;
-  	display: block;
-  	width: fit-content;
-  	margin: 40px auto 0 auto;
-}
+		#save-list-ui {
+			display: flex;
+			justify-content: center;
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
 
-.cards {
-	position: relative;
-
-	#save-list-ui {
-		display: flex;
-  		justify-content: center;
-		position: sticky;
-		top: 0;
-		z-index: 1;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-
-		button {
-			margin: 10px 0;
+			button {
+				margin: 10px 0;
+			}
 		}
 	}
 }
 
-.card {
-	border: 1px solid #ddd;
-	padding: 16px 20px;
-	margin: 20px;
-	border-radius: 8px;
-	position: relative;
-	overflow: hidden;
-}
+#saved {
+	h2 {
+		margin: 20px 20px 0 20px;
+	}
 
-.fade {
-	width: 50vw;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 20%;
-	z-index: -1;
-	background: linear-gradient(
-		to right,
-		white 60%,
-		rgba(255, 255, 255, 0) 100%
-	);
-}
+	.controls {
+		position: relative;
+		padding: 0 60px;
 
-.map {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 50%;
-	right: 0;
-	z-index: -2;
-	margin: auto;
+		.title {
+			font-size: 24px;
+			display: block;
+			width: fit-content;
+			margin: 40px auto 0 auto;
+		}
 
-	.leaflet-control-attribution {
-		font-size: 8px;
-		opacity: 0.7;
+		.delete {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			margin: auto 20px auto 0;
+
+			transform: scale(1);
+    		transition: transform 0.2s ease;
+			cursor: pointer;
+		}
+		.delete:hover {
+			transform: scale(1.1);
+		}
+	}
+
+	.card {
+		border: 1px solid #ddd;
+		padding: 16px 20px;
+		margin: 20px;
+		border-radius: 8px;
+		position: relative;
+		overflow: hidden;
+
+		.fade {
+			width: 50vw;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 20%;
+			z-index: -1;
+			background: linear-gradient(
+				to right,
+				white 60%,
+				rgba(255, 255, 255, 0) 100%
+			);
+		}
+
+		.map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 50%;
+			right: 0;
+			z-index: -2;
+			margin: auto;
+
+			.leaflet-control-attribution {
+				font-size: 8px;
+				opacity: 0.7;
+			}
+		}
 	}
 }
 
