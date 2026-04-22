@@ -532,7 +532,10 @@
                     renderSaveListButton();
                     document.getElementById("toggle-btn").click();
                     renderSavedLists();
-                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    document.getElementById("header").scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
                 });
 
                 container.appendChild(button);

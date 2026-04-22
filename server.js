@@ -5,9 +5,9 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
-const { db, connectToDB } = require('./apis/db');
+const { db, connectToDB } = require('./services/tidb');
 const saltRounds = 10;
-const { getResults } = require('./apis/zillow-realtyapi');
+const { getResults } = require('./services/zillow-realtyapi');
 
 
 (async () => {
