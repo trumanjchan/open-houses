@@ -163,7 +163,7 @@
                 });
 
                 const data = await res.json();
-                searchList.push(data);
+                searchList[0] = data;
 
                 renderListings(searchList[0]);
             }
