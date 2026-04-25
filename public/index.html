@@ -84,6 +84,8 @@
                 savedLists: []
             };
             let searchList = [];
+            let searchObserver = null;
+            let savedObserver = null;
 
             const parts = window.location.pathname.split("/").slice(1);
             const name = parts[0];
@@ -102,9 +104,54 @@
                 if (name && slug) {
                     loadList(name, slug);
                 } else if (auth.loggedIn) {
+                    if (savedObserver) {
+                        savedObserver.disconnect();
+                        savedObserver = null;
+                    }
                     renderSavedLists();
                 }
             });
+
+            /* lazy-load each Leaflet map */
+            function createObserver() {
+                return new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+
+                        const el = entry.target;
+
+                        if (el.dataset.initialized === "true") return;
+                        el.dataset.initialized = "true";
+
+                        initMap(el);
+
+                        obs.unobserve(el);
+                    });
+                }, {
+                    threshold: 0.15,
+                    rootMargin: "200px 0px"
+                });
+            }
+            
+            function initMap(el) {
+                const latitude = parseFloat(el.dataset.lat);
+                const longitude = parseFloat(el.dataset.lng);
+
+                if (latitude == null || longitude == null) return;
+
+                const map = L.map(el, {
+                    zoomControl: false
+                }).setView([latitude, longitude], 13);
+
+                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(map);
+
+                L.marker([latitude, longitude]).addTo(map);
+
+                setTimeout(() => map.invalidateSize(), 0);
+            }
+
 
             async function login(e) {
                 e.preventDefault();
@@ -143,6 +190,10 @@
 
                 renderSavedLists();
                 if (searchList.length > 0) {
+                    if (searchObserver) {
+                        searchObserver.disconnect();
+                        searchObserver = null;
+                    }
                     renderListings(searchList[0]);
                 }
             }
@@ -165,9 +216,12 @@
                 const data = await res.json();
                 searchList[0] = data;
 
+                if (searchObserver) {
+                    searchObserver.disconnect();
+                    searchObserver = null;
+                }
                 renderListings(searchList[0]);
             }
-
 
             function renderSavedLists() {
                 const container = document.getElementById("saved");
@@ -209,6 +263,7 @@
 
                     savedList.appendChild(controls);
 
+                    savedObserver = createObserver();
                     list.list.forEach((listing) => {
                         const card = document.createElement("div");
                         card.className = "card";
@@ -236,7 +291,7 @@
                         savedList.appendChild(card);
 
                         const mapEl = card.querySelector(".map");
-                        observer.observe(mapEl);
+                        savedObserver.observe(mapEl);
 
                         const openHouseShowingList = listing.showings;
                         if (openHouseShowingList) {
@@ -274,12 +329,12 @@
                 if (document.getElementById("home-btn")) {
                     document.getElementById("home-btn").style.display = "block";
                 }
-
                 const container = document.getElementById("saved");
                 container.innerHTML = `
                     <h2>${name}'s list: ${data.title}</h2>
                 `;
 
+                savedObserver = createObserver();
                 data.list.forEach((listing) => {
                     const card = document.createElement("div");
                     card.className = "card";
@@ -307,7 +362,7 @@
                     container.appendChild(card);
 
                     const mapEl = card.querySelector(".map");
-                    observer.observe(mapEl);
+                    savedObserver.observe(mapEl);
 
                     const openHouseShowingList = listing.showings;
                     if (openHouseShowingList) {
@@ -362,6 +417,7 @@
                     container.innerHTML = "<h4>No search results found.</h4>";
                     return;
                 }
+                searchObserver = createObserver();
                 data.searchResults.forEach((listing) => {
                     const card = document.createElement("div");
                     card.className = "card";
@@ -390,7 +446,7 @@
 
                     const mapEl = card.querySelector(".map");
                     if (mapEl) {
-                        observer.observe(mapEl);
+                        searchObserver.observe(mapEl);
                     }
 
                     if (auth.loggedIn) {
@@ -463,6 +519,10 @@
                         const res = await fetch(`/api/user/${auth.name}`);
                         auth.savedLists = await res.json();
 
+                        if (savedObserver) {
+                            savedObserver.disconnect();
+                            savedObserver = null;
+                        }
                         renderSavedLists();
                     }
                 } else {
@@ -531,6 +591,10 @@
                     document.querySelectorAll(".save-card-checkbox:checked").forEach(cb => cb.checked = false);
                     renderSaveListButton();
                     document.getElementById("toggle-btn").click();
+                    if (savedObserver) {
+                        savedObserver.disconnect();
+                        savedObserver = null;
+                    }
                     renderSavedLists();
                     document.getElementById("header").scrollIntoView({
                         behavior: "smooth",
@@ -545,6 +609,10 @@
                 const res = await fetch(`/api/${name}/${slug}`);
                 const data = await res.json();
 
+                if (savedObserver) {
+                    savedObserver.disconnect();
+                    savedObserver = null;
+                }
                 renderShareableList(name, data);
                 window.scrollTo(0, 0);
             }
@@ -555,44 +623,6 @@
                     .trim()
                     .replace(/\s+/g, "-")
                     .replace(/[^\w-]/g, "");
-            }
-
-            /* lazy-load each Leaflet map with Intersection Observer */
-            const observer = new IntersectionObserver((entries, obs) => {
-                entries.forEach(entry => {
-                    if (!entry.isIntersecting) return;
-
-                    const el = entry.target;
-
-                    if (el.dataset.initialized === "true") return;
-                    el.dataset.initialized = "true";
-
-                    initMap(el);
-
-                    obs.unobserve(el);
-                });
-            }, {
-                threshold: 0.15,
-                rootMargin: "200px 0px"
-            });
-
-            function initMap(el) {
-                const latitude = parseFloat(el.dataset.lat);
-                const longitude = parseFloat(el.dataset.lng);
-
-                if (latitude == null || longitude == null) return;
-
-                const map = L.map(el, {
-                    zoomControl: false
-                }).setView([latitude, longitude], 13);
-
-                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                    attribution: "&copy; OpenStreetMap contributors"
-                }).addTo(map);
-
-                L.marker([latitude, longitude]).addTo(map);
-
-                setTimeout(() => map.invalidateSize(), 0);
             }
         </script>
     </body>
