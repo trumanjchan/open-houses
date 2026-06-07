@@ -6,7 +6,7 @@ On the site a user can search for property with filters such as only show proper
 
 ## App Workflow
 
-<img src=".github/images/demo.gif" alt="demo gif" width="100%">
+[Watch Demo Video](./.github/demo/open-houses.mp4)
 
 ---
 
