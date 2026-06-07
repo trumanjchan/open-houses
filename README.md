@@ -6,7 +6,7 @@ On the site a user can search for property with filters such as only show proper
 
 ## App Workflow
 
-[Watch Demo Video](./.github/demo/open-houses.mp4)
+[Watch Demo Video](https://youtu.be/3FRwNxaDOxM?si=h2Hrg4XtLG4vLo_x)
 
 ---
 
