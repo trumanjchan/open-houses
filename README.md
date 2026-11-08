@@ -4,9 +4,15 @@ Open Houses was built for realtors to share a list of properties their client ma
 
 On the site a user can search for property with filters such as only show properties with upcoming open house dates. Users can create an account and sign in to save properties to a list, and share each list as a link. A user can organize their lists by day and open house times, effectively creating a scheduling list for back-to-back tours.
 
-## App Workflow
-
 [Watch Demo Video](https://youtu.be/3FRwNxaDOxM?si=h2Hrg4XtLG4vLo_x)
+
+## Features
+- Private profile page for saved lists (only for registered users)
+- Shareable lists (only for registered users)
+- Encrypted passwords (bcrypt)
+- Pagination
+- Client-side caching
+- Lazy loading (Intersection Observer)
 
 ---
 
