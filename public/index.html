@@ -69,7 +69,9 @@
                 </button>
             </form>
 
+            <div id="top-of-results" class="pages"></div>
             <div id="results"></div>
+            <div class="pages"></div>
         </section>
 
         <section id="saved"></section>
@@ -86,6 +88,7 @@
             let searchList = [];
             let searchObserver = null;
             let savedObserver = null;
+            var page = 1;
 
             const parts = window.location.pathname.split("/").slice(1);
             const name = parts[0];
@@ -194,7 +197,7 @@
                         searchObserver.disconnect();
                         searchObserver = null;
                     }
-                    renderListings(searchList[0]);
+                    goToPage(page);
                 }
             }
 
@@ -210,17 +213,24 @@
                 const res = await fetch("/api/search", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ location, min, max, tourOpenHouse, tour3D }),
+                    body: JSON.stringify({ location, page, min, max, tourOpenHouse, tour3D }),
                 });
 
                 const data = await res.json();
-                searchList[0] = data;
+                searchList[page] = data;
 
                 if (searchObserver) {
                     searchObserver.disconnect();
                     searchObserver = null;
                 }
-                renderListings(searchList[0]);
+                renderListings(searchList[page]);
+
+                document.querySelectorAll('.page-btn.active').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.page-btn').forEach(btn => {
+                    if (btn.textContent === String(page)) {
+                        btn.classList.add('active');
+                    }
+                });
             }
 
             function renderSavedLists() {
@@ -398,14 +408,6 @@
                 const container = document.getElementById("results");
                 container.innerHTML = "";
 
-                const searchInfo = document.createElement("h4");
-                searchInfo.innerHTML = `
-                    <p>Each page displays up to ${data.pagesInfo.resultsPerPage} listings.</p>
-                    <p>Page: ${data.pagesInfo.currentPage}/${data.pagesInfo.totalPages}</p>
-                    <p>Total Listings: ${data.resultsCount.totalMatchingCount}</p>
-                `;
-                container.appendChild(searchInfo);
-
                 const cards = document.createElement("div");
                 cards.className = "cards";
 
@@ -505,6 +507,33 @@
 
                     container.appendChild(cards);
                 });
+
+                const pageContainers = document.getElementsByClassName("pages");
+                for (const pageContainer of pageContainers) {
+                    pageContainer.innerHTML = "";
+
+                    for (let i = 1; i <= data.pagesInfo.totalPages; i++) {
+                        pageContainer.innerHTML += `<button class="page-btn" onclick="goToPage(${i})">${i}</button>`;
+                    }
+                }
+            }
+
+            function goToPage(pageNumber) {
+                page = pageNumber;
+
+                if (searchList[page]) {
+                    renderListings(searchList[page]);
+
+                    document.querySelectorAll('.page-btn.active').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.page-btn').forEach(btn => {
+                        if (btn.textContent === String(page)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                } else {
+                    search(new Event("submit"));
+                }
+                document.getElementById('top-of-results').scrollIntoView();
             }
 
             async function deleteSavedList(listId) {

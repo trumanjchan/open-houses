@@ -5,7 +5,7 @@ dotenv.config();
 
 const url = "https://zillow.realtyapi.io/search/byaddress";
 
-const getResults = async (location, min, max, tourOpenHouse, tour3D) => {
+const getResults = async (location, page, min, max, tourOpenHouse, tour3D) => {
 	try {
 		const tours = [];
 		if (tourOpenHouse) {
@@ -24,7 +24,7 @@ const getResults = async (location, min, max, tourOpenHouse, tour3D) => {
 			},
 			params: {
 				location: location,
-				page: "1",
+				page: page,
 				sortOrder: "Price_Low_to_High",
 				listingStatus: "For_Sale",
 				listPriceRange: `min:${min}, max:${max}`,

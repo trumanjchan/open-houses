@@ -28,10 +28,6 @@ const { getResults } = require('./services/zillow-realtyapi');
 		app.use(express.static(path.join(__dirname, "public")));
 		app.use(express.json());
 
-		app.get("/", (req, res) => {
-			res.sendFile(path.join(__dirname, "public", "index.html"));
-		});
-
 		app.get("/api/user/:name", async (req, res) => {
 			try {
 				const { name } = req.params;
@@ -105,9 +101,9 @@ const { getResults } = require('./services/zillow-realtyapi');
 
 		app.post("/api/search", async (req, res) => {
 			try {
-				const { location, min, max, tourOpenHouse, tour3D } = req.body;
+				const { location, page, min, max, tourOpenHouse, tour3D } = req.body;
 
-				const result = await getResults(location, min, max, tourOpenHouse, tour3D);
+				const result = await getResults(location, page, min, max, tourOpenHouse, tour3D);
 				res.json(result);
 			} catch (error) {
 				console.error('API route error:', error);

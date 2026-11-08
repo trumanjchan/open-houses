@@ -188,6 +188,28 @@ img, label, legend {
 	}
 }
 
+#top-of-results {
+	scroll-margin-top: 20px;
+}
+.pages {
+	margin: 20px 20px 0 20px;
+	display: flex;
+  	gap: 5px;
+  	justify-content: end;
+	
+	&:last-child {
+		margin: 0 20px 20px 20px;
+	}
+
+	.page-btn {
+		font-variant-numeric: tabular-nums;
+
+		&.active {
+			font-weight: bold;
+		}
+	}
+}
+
 #saved {
 	h2 {
 		margin: 20px 20px 0 20px;
