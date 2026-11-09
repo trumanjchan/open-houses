@@ -9,7 +9,7 @@ On the site a user can search for property with filters such as only show proper
 ## Features
 - Private profile page for saved lists (only for registered users)
 - Shareable lists (only for registered users)
-- Encrypted passwords (bcrypt)
+- Hashed passwords (bcrypt)
 - Pagination
 - Client-side caching
 - Lazy loading (Intersection Observer)

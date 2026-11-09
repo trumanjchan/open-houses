@@ -167,27 +167,6 @@ img, label, legend {
 	}
 }
 
-#results {
-	.cards {
-		position: relative;
-
-		#save-list-ui {
-			display: flex;
-			justify-content: center;
-			position: sticky;
-			top: 0;
-			z-index: 1;
-			background: rgba(255, 255, 255, 0.1);
-			backdrop-filter: blur(10px);
-			-webkit-backdrop-filter: blur(10px);
-
-			button {
-				margin: 10px 0;
-			}
-		}
-	}
-}
-
 #top-of-results {
 	scroll-margin-top: 20px;
 }
@@ -207,6 +186,21 @@ img, label, legend {
 		&.active {
 			font-weight: bold;
 		}
+	}
+}
+
+#save-list-ui {
+	display: flex;
+	justify-content: center;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+
+	button {
+		margin: 10px 0;
 	}
 }
 
