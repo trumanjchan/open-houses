@@ -515,6 +515,14 @@
                         pageContainer.innerHTML += `<button class="page-btn" onclick="goToPage(${i})">${i}</button>`;
                     }
                 }
+
+                for (const zpid of auth.currentList.map(item => item.zpid)) {
+                    const checkbox = document.getElementById(`save-${zpid}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        checkbox.parentElement.parentElement.style.borderColor = "#007aff";
+                    }
+                }
             }
 
             function goToPage(pageNumber) {
